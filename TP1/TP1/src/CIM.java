@@ -144,7 +144,7 @@ public class CIM {
                             }
                         }
                     });
-                    calculateNeighbours(particlesToEvaluate, particleMatrix, false);
+                    calculateNeighbours(particlesToEvaluate, particleMatrix, false, i, j);
                 }
             }
         }
