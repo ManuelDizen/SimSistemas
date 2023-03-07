@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class CIM {
@@ -9,8 +7,8 @@ public class CIM {
 
         private double x;
         private double y;
-        private int r;
-        private List<Particle> neighbours;
+        private double r;
+        private final List<Particle> neighbours;
 
         public int getIdx() {
             return idx;
@@ -22,7 +20,7 @@ public class CIM {
 
         private int idx;
 
-        public Particle(int idx, double x, double y, int r){
+        public Particle(int idx, double x, double y, double r){
             this.idx = idx;
             this.x = x;
             this.y = y;
@@ -46,11 +44,11 @@ public class CIM {
             this.y = y;
         }
 
-        public  int getR() {
+        public double getR() {
             return r;
         }
 
-        public  void setR(int r) {
+        public  void setR(double r) {
             this.r = r;
         }
 
@@ -69,19 +67,19 @@ public class CIM {
 
     }
     private static final int CIM_LENGTH_SIDE = 20;
+    private static final int CIM_PARTICLE_NUMBER = 10;
+    private static final double CIM_PARTICLE_RADIUS_SIZE = 0.25;
+    private static final int CIM_INTERACTION_RADIUS = 1;
     private static final int CIM_CELLS_PER_SIDE = 5;
-    private static final int CIM_CELL_SIZE = CIM_LENGTH_SIDE/CIM_CELLS_PER_SIDE;
 
     private void locateInMatrix(Particle p, int L, int M, List<List<List<Particle>>> particleMatrix) {
         int idxX = (int) Math.floor(p.getX()/M);
         int idxY = (int) Math.floor(p.getY()/M);
         if(particleMatrix.get(idxX) == null)
             particleMatrix.add(idxX, new ArrayList<>());
-        if(particleMatrix.get(idxX).get(idxY) == null){
+        if(particleMatrix.get(idxX).get(idxY) == null)
             particleMatrix.get(idxX).add(idxY, new ArrayList<>());
-        }
         particleMatrix.get(idxX).get(idxY).add(p);
-
     }
 
     /*
@@ -96,7 +94,6 @@ public class CIM {
 
     private void calculateNeighbours(List<Particle> particles, List<List<List<Particle>>> particleMatrix,
                                      boolean round, int cellX, int cellY, int r_c) {
-        //List<Particle> sameCell = particleMatrix.get(cellX).get(cellY).subList(particleMatrix.get(cellX).get(cellY).indexOf(p), particleMatrix.get(cellX).get(cellY).size()-1);
         for(Particle p : particles) {
             for (int i = particles.indexOf(p) + 1; i < particles.size(); i++) {
                 /*
@@ -197,12 +194,26 @@ public class CIM {
                         p.addNeighbour(k);
                 }
             }
-
+            System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: " + p.getY()
+        + ")\n"
+            + "---------------------");
+            for(Particle f : p.getNeighbours()){
+                System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
+            }
         }
 
     }
 
-    private void CellIndexMethod(int N, int r, int L, int M, int r_c, boolean round){
+    private void initializeMatrix(List<List<List<Particle>>> particleMatrix, int cells){
+        for(int i = 0; i < cells; i++){
+            particleMatrix.add(i, new ArrayList<>());
+            for(int j = 0; j < cells; j++){
+                particleMatrix.get(i).add(j, new ArrayList<>());
+            }
+        }
+    }
+
+    private void CellIndexMethod(int N, double r, int L, int M, int r_c, boolean round){
 
         if(L/M <= r_c){
             throw new RuntimeException("L/M debe ser mayor exclusivo a r_c. Terminando ejecución");
@@ -210,12 +221,12 @@ public class CIM {
         //tenemos un espacio de LxL, y habría que randomizar N posiciones
         //cada partícula es un par ordenado, con lo que habría que randomizar n posiciones para cada dimensión
 
-        List<Particle> particleList = new ArrayList<Particle>();
+        //List<Particle> particleList = new ArrayList<Particle>();
         List<List<List<Particle>>> particleMatrix = new ArrayList<>();
-
+        initializeMatrix(particleMatrix, M);
         for(int i=0; i<N; i++) {
             Particle p = new Particle(i, Math.random() * L, Math.random() * L, r);
-            particleList.add(p);
+            //particleList.add(p);
             locateInMatrix(p, L, M, particleMatrix);
         }
 
@@ -223,19 +234,16 @@ public class CIM {
             for(int j=0; j<M; j++) {
                 List<Particle> auxList = particleMatrix.get(i).get(j);
                 if(auxList != null && !auxList.isEmpty()) {
-                    //TODO: Esto está dos veces. ¿Se podrá sacar?
-                    List<Particle> particlesToEvaluate = particleMatrix.get(i).get(j);
-                    if(particlesToEvaluate != null) {
-                        particlesToEvaluate.sort((o1, o2) -> {
-                            double distX = o1.getX() - o2.getX();
-                            double retVal = distX != 0 ? distX : (o1.getY() - o2.getY());
-                            return retVal > 0 ? 1 : (retVal < 0 ? -1 : 0);
-                        });
-                    }
-                    calculateNeighbours(particlesToEvaluate, particleMatrix, round, i, j, r_c);
+                    auxList.sort((o1, o2) -> {
+                        double distX = o1.getX() - o2.getX();
+                        double retVal = distX != 0 ? distX : (o1.getY() - o2.getY());
+                        return retVal > 0 ? 1 : (retVal < 0 ? -1 : 0);
+                    });
+                    calculateNeighbours(auxList, particleMatrix, round, i, j, r_c);
                 }
             }
         }
+        // A esta altura, las particulas insertadas en la matriz deberían tener sus vecinos ya guardados.
 
     }
 
@@ -243,11 +251,11 @@ public class CIM {
 
     public static void main(String[] args) {
         boolean round = false;
-        int N = 1;
-        int L = 1;
-        int r = 1;
-        int M = 1;
-        int r_c = 1;
+        int N = CIM_PARTICLE_NUMBER;
+        int L = CIM_LENGTH_SIDE;
+        double r = CIM_PARTICLE_RADIUS_SIZE;
+        int M = CIM_CELLS_PER_SIDE;
+        int r_c = CIM_INTERACTION_RADIUS;
         CIM cim = new CIM();
         cim.CellIndexMethod(N, r, L, M, r_c, round);
     }
