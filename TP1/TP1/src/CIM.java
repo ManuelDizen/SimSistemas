@@ -11,8 +11,8 @@ public class CIM {
     private static final boolean CIM_ROUND = true;
 
     private void locateInMatrix(Particle p, int L, int M, List<List<List<Particle>>> particleMatrix) {
-        int idxX = (int) Math.floor(p.getX()/M);
-        int idxY = (int) Math.floor(p.getY()/M);
+        int idxX = (int) Math.floor(p.getX()*M/L);
+        int idxY = (int) Math.floor(p.getY()*M/L);
         if(particleMatrix.get(idxX) == null)
             particleMatrix.add(idxX, new ArrayList<>());
         if(particleMatrix.get(idxX).get(idxY) == null)
@@ -212,7 +212,7 @@ public class CIM {
         }
         // A esta altura, las particulas insertadas en la matriz deberían tener sus vecinos ya guardados.
         long totalTime = System.nanoTime() - startTime;
-        System.out.println("Execution time: " + totalTime/1000000 + "ms\n");
+        System.out.println("Execution time: " + totalTime/1000 + "ms\n");
         for(Particle p : particleList) {
             System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: "
                     + p.getY() + ")\n" + "---------------------");
