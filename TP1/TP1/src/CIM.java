@@ -8,6 +8,7 @@ public class CIM {
     private static final double CIM_INTERACTION_RADIUS = 2;
     private static final int CIM_CELLS_PER_SIDE = 5;
     private static final boolean CIM_BRUTE = true; // False = CIM, True = Brute
+    private static final boolean CIM_ROUND = true;
 
     private void locateInMatrix(Particle p, int L, int M, List<List<List<Particle>>> particleMatrix) {
         int idxX = (int) Math.floor(p.getX()/M);
@@ -51,13 +52,6 @@ public class CIM {
                     }
                 }
             }
-            // Una a la derecha. Casos:
-            /*
-                1) pos X + 1 es MENOR al límite --> Da igual si es round o no, devuelvo ese
-                2) pos X + 1 es IGUAL al limite Y deja redondo --> Devuelvo 0
-                3) pos X + 1 es IGUAL al limite Y NO deja reodndo --> Devuelvo -1, indicando
-                    que no necesita análisis
-             */
             int rightAdjacentCellX = cellX+1 < CIM_CELLS_PER_SIDE? cellX+1 : (
                         round && cellX+1 == CIM_CELLS_PER_SIDE? 0 : -1
                     );
@@ -180,13 +174,14 @@ public class CIM {
         }
     }
 
-    private void CellIndexMethod(int N, double r, int L, int M, double r_c, boolean round){
+    private List<Particle> CellIndexMethod(int N, double r, int L, int M, double r_c, boolean round){
 
         if(L/M <= r_c){
             throw new RuntimeException("L/M debe ser mayor exclusivo a r_c. Terminando ejecución");
         }
         //tenemos un espacio de LxL, y habría que randomizar N posiciones
-        //cada partícula es un par ordenado, con lo que habría que randomizar n posiciones para cada dimensión
+        //cada partícula es un par ordenado, con lo que habría que randomizar n posiciones
+        // para cada dimensión
 
         List<Particle> particleList = new ArrayList<Particle>();
         List<List<List<Particle>>> particleMatrix = new ArrayList<>();
@@ -232,11 +227,11 @@ public class CIM {
                 System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
             }
         }
-
+        return particleList;
     }
 
-    private void BruteMethod(int N, double r, int L, int M, double r_c, boolean round){
-        List<Particle> particleList = new ArrayList<Particle>();
+    private List<Particle> BruteMethod(int N, double r, int L, int M, double r_c, boolean round){
+        List<Particle> particleList = new ArrayList<>();
         for(int i=0; i<N; i++) {
             Particle p = new Particle(i, Math.random() * L, Math.random() * L, r);
             particleList.add(p);
@@ -269,21 +264,24 @@ public class CIM {
                 System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
             }
         }
+
+        return particleList;
     }
 
     public static void main(String[] args) {
-        boolean round = true;
-        int N = CIM_PARTICLE_NUMBER;
-        int L = CIM_LENGTH_SIDE;
-        double r = CIM_PARTICLE_RADIUS_SIZE;
-        int M = CIM_CELLS_PER_SIDE;
-        double r_c = CIM_INTERACTION_RADIUS;
-        boolean brute = CIM_BRUTE;
+
+        // TODO: Cambiar generación random de particulas por las del archivo estático / dinámico
+
         CIM cim = new CIM();
-        if(!brute)
-            cim.CellIndexMethod(N, r, L, M, r_c, round);
+        List<Particle> particles;
+        if(!CIM_BRUTE)
+            particles = cim.CellIndexMethod(CIM_PARTICLE_NUMBER, CIM_PARTICLE_RADIUS_SIZE, CIM_LENGTH_SIDE,
+                    CIM_CELLS_PER_SIDE, CIM_INTERACTION_RADIUS, CIM_ROUND);
         else
-            cim.BruteMethod(N, r, L, M, r_c, round);
+            particles = cim.BruteMethod(CIM_PARTICLE_NUMBER, CIM_PARTICLE_RADIUS_SIZE, CIM_LENGTH_SIDE,
+                    CIM_CELLS_PER_SIDE, CIM_INTERACTION_RADIUS, CIM_ROUND);
+
+        Generator.generateOutputFile(particles, CIM_PARTICLE_NUMBER, CIM_INTERACTION_RADIUS);
     }
 
 }

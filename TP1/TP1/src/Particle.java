@@ -68,11 +68,11 @@ public class Particle {
     }
 
     public boolean isPeriodicNeighbour(Particle p, double r_c, double L){
-        double dx = Math.abs(this.x - p.x);
+        double dx = Math.abs(this.getX() - p.getX());
         if (dx > L / 2)
             dx = L - dx;
 
-        double dy = Math.abs(this.y - p.y);
+        double dy = Math.abs(this.getY() - p.getY());
         if (dy > L / 2)
             dy = L - dy;
 
