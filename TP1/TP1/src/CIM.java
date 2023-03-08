@@ -64,6 +64,25 @@ public class CIM {
             this.neighbours.addAll(pList);
         }
 
+        public boolean isNeighbour(Particle p, double r_c){
+            return Math.sqrt(Math.pow(this.getX() - p.getX(), 2) +
+                    Math.pow(this.getY() - p.getY(), 2))
+                    < (this.getR() +  p.getR() + r_c);
+        }
+
+        public boolean isPeriodicNeighbour(Particle p, double r_c, double L){
+            double dx = Math.abs(this.x - p.x);
+            if (dx > L / 2)
+                dx = L - dx;
+
+            double dy = Math.abs(this.y - p.y);
+            if (dy > L / 2)
+                dy = L - dy;
+
+            return Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2))
+                    < (this.getR() +  p.getR() + r_c);
+        }
+
 
     }
     private static final int CIM_LENGTH_SIDE = 10;
@@ -93,18 +112,26 @@ public class CIM {
      */
 
     private void calculateNeighbours(List<Particle> particles, List<List<List<Particle>>> particleMatrix,
-                                     boolean round, int cellX, int cellY, int r_c) {
+                                     boolean round, int cellX, int cellY, double r_c, int L) {
         for(Particle p : particles) {
             for (int i = particles.indexOf(p) + 1; i < particles.size(); i++) {
                 /*
                 Condición de vecino:
                 raiz((x1 - x2)² + (y1-y2)^2) < r_c + 2r
                  */
-                if (
-                        Math.pow(p.getX() - particles.get(i).getX(), 2) +
-                                Math.pow(p.getY() - particles.get(i).getY(), 2)
-                                < (2 * p.getR()) + r_c)
-                    p.addNeighbour(particles.get(i));
+                Particle k = particles.get(i);
+                if(!round){
+                    if(p.isNeighbour(k, r_c)){
+                        p.addNeighbour(k);
+                        k.addNeighbour(p);
+                    }
+                }
+                else{
+                    if(p.isPeriodicNeighbour(k, r_c, L)){
+                        p.addNeighbour(k);
+                        k.addNeighbour(p);
+                    }
+                }
             }
             // Una a la derecha. Casos:
             /*
@@ -126,11 +153,18 @@ public class CIM {
              */
             if(rightAdjacentCellX >= 0 && particleMatrix.get(rightAdjacentCellX).get(cellY) != null) {
                 for (Particle k : particleMatrix.get(rightAdjacentCellX).get(cellY)) {
-                    if (
-                            Math.pow(p.getX() - k.getX(), 2) +
-                                    Math.pow(p.getY() - k.getY(), 2)
-                                    < (2 * p.getR()) + r_c)
-                        p.addNeighbour(k);
+                    if(!round){
+                        if(p.isNeighbour(k, r_c)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
+                    else{
+                        if(p.isPeriodicNeighbour(k, r_c, L)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
                 }
             }
             int bottomAdjacentCellY = cellY+1 < CIM_CELLS_PER_SIDE? cellY+1 : (
@@ -146,11 +180,18 @@ public class CIM {
             if(rightAdjacentCellX >= 0 && bottomAdjacentCellY >= 0
                     && particleMatrix.get(rightAdjacentCellX).get(bottomAdjacentCellY) != null){
                 for (Particle k : particleMatrix.get(rightAdjacentCellX).get(bottomAdjacentCellY)) {
-                    if (
-                            Math.pow(p.getX() - k.getX(), 2) +
-                                    Math.pow(p.getY() - k.getY(), 2)
-                                    < (2 * p.getR()) + r_c)
-                        p.addNeighbour(k);
+                    if(!round){
+                        if(p.isNeighbour(k, r_c)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
+                    else{
+                        if(p.isPeriodicNeighbour(k, r_c, L)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
                 }
             }
 
@@ -165,11 +206,18 @@ public class CIM {
 
             if(bottomAdjacentCellY >= 0  && particleMatrix.get(cellX).get(bottomAdjacentCellY) != null){
                 for (Particle k : particleMatrix.get(cellX).get(bottomAdjacentCellY)) {
-                    if (
-                            Math.pow(p.getX() - k.getX(), 2) +
-                                    Math.pow(p.getY() - k.getY(), 2)
-                                    < (2 * p.getR()) + r_c)
-                        p.addNeighbour(k);
+                    if(!round){
+                        if(p.isNeighbour(k, r_c)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
+                    else{
+                        if(p.isPeriodicNeighbour(k, r_c, L)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
                 }
             }
 
@@ -187,18 +235,29 @@ public class CIM {
             if(leftAdjacentCellX >= 0 && bottomAdjacentCellY >= 0
                     && particleMatrix.get(leftAdjacentCellX).get(bottomAdjacentCellY) != null){
                 for (Particle k : particleMatrix.get(rightAdjacentCellX).get(bottomAdjacentCellY)) {
-                    if (
-                            Math.pow(p.getX() - k.getX(), 2) +
-                                    Math.pow(p.getY() - k.getY(), 2)
-                                    < (2 * p.getR()) + r_c)
-                        p.addNeighbour(k);
+                    if(!round){
+                        if(p.isNeighbour(k, r_c)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
+                    else{
+                        if(p.isPeriodicNeighbour(k, r_c, L)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
                 }
             }
-            /*System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: "
-                    + p.getY() + ")\n" + "---------------------");
-            for(Particle f : p.getNeighbours()){
-                System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
-            }*/
+            /*
+            TODO!!!!!!!!
+                Hay un error: Cuando hay contorno, seguimos evaluando la distancia euclidea. Esto obviamente
+                no va a dar el resultado esperado, xq el cálculo se hace con la pos X y la pos Y.
+                .
+                Update: Creo que lo resolví con los métodos dentro de la clase.
+                Si miramos, hay un método que permite tomar la distancia absoluta entre las particulas
+                a la redonda (getPeriodicDistance).
+             */
         }
 
     }
@@ -243,7 +302,7 @@ public class CIM {
                         double retVal = distX != 0 ? distX : (o1.getY() - o2.getY());
                         return retVal > 0 ? 1 : (retVal < 0 ? -1 : 0);
                     });
-                    calculateNeighbours(auxList, particleMatrix, round, i, j, r_c);
+                    calculateNeighbours(auxList, particleMatrix, round, i, j, r_c, L);
                 }
             }
         }
