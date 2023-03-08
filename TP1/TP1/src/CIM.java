@@ -213,13 +213,6 @@ public class CIM {
         // A esta altura, las particulas insertadas en la matriz deberían tener sus vecinos ya guardados.
         long totalTime = System.nanoTime() - startTime;
         System.out.println("Execution time: " + totalTime/1000000 + "ms\n");
-        /*for (Particle p : particleList){
-            System.out.print(p.getIdx() + ":");
-            for (Particle neighbour : p.getNeighbours()){
-                System.out.print(" " + neighbour.getIdx());
-            }
-            System.out.print("\n");
-        }*/
         for(Particle p : particleList) {
             System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: "
                     + p.getY() + ")\n" + "---------------------");
