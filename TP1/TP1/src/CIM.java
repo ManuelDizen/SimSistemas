@@ -2,94 +2,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CIM {
-
-    private static class Particle{
-
-        private double x;
-        private double y;
-        private double r;
-        private final List<Particle> neighbours;
-
-        public int getIdx() {
-            return idx;
-        }
-
-        public void setIdx(int idx) {
-            this.idx = idx;
-        }
-
-        private int idx;
-
-        public Particle(int idx, double x, double y, double r){
-            this.idx = idx;
-            this.x = x;
-            this.y = y;
-            this.r = r;
-            this.neighbours = new ArrayList<>();
-        }
-
-        public double getX() {
-            return x;
-        }
-
-        public void setX(double x) {
-            this.x = x;
-        }
-
-        public double getY() {
-            return y;
-        }
-
-        public  void setY(double y) {
-            this.y = y;
-        }
-
-        public double getR() {
-            return r;
-        }
-
-        public  void setR(double r) {
-            this.r = r;
-        }
-
-        public List<Particle> getNeighbours() {
-            return neighbours;
-        }
-
-        public void addNeighbour(Particle p) {
-            this.neighbours.add(p);
-        }
-
-        public void addNeighbours(List<Particle> pList) {
-            this.neighbours.addAll(pList);
-        }
-
-        public boolean isNeighbour(Particle p, double r_c){
-            return Math.sqrt(Math.pow(this.getX() - p.getX(), 2) +
-                    Math.pow(this.getY() - p.getY(), 2))
-                    < (this.getR() +  p.getR() + r_c);
-        }
-
-        public boolean isPeriodicNeighbour(Particle p, double r_c, double L){
-            double dx = Math.abs(this.x - p.x);
-            if (dx > L / 2)
-                dx = L - dx;
-
-            double dy = Math.abs(this.y - p.y);
-            if (dy > L / 2)
-                dy = L - dy;
-
-            return Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2))
-                    < (this.getR() +  p.getR() + r_c);
-        }
-
-
-    }
     private static final int CIM_LENGTH_SIDE = 10;
     private static final int CIM_PARTICLE_NUMBER = 10;
     private static final double CIM_PARTICLE_RADIUS_SIZE = 0.25;
-    private static final int CIM_INTERACTION_RADIUS = 1;
+    private static final double CIM_INTERACTION_RADIUS = 2;
     private static final int CIM_CELLS_PER_SIDE = 5;
+    private static final boolean CIM_BRUTE = true; // False = CIM, True = Brute
 
     private void locateInMatrix(Particle p, int L, int M, List<List<List<Particle>>> particleMatrix) {
         int idxX = (int) Math.floor(p.getX()/M);
@@ -249,15 +167,6 @@ public class CIM {
                     }
                 }
             }
-            /*
-            TODO!!!!!!!!
-                Hay un error: Cuando hay contorno, seguimos evaluando la distancia euclidea. Esto obviamente
-                no va a dar el resultado esperado, xq el cálculo se hace con la pos X y la pos Y.
-                .
-                Update: Creo que lo resolví con los métodos dentro de la clase.
-                Si miramos, hay un método que permite tomar la distancia absoluta entre las particulas
-                a la redonda (getPeriodicDistance).
-             */
         }
 
     }
@@ -271,7 +180,7 @@ public class CIM {
         }
     }
 
-    private void CellIndexMethod(int N, double r, int L, int M, int r_c, boolean round){
+    private void CellIndexMethod(int N, double r, int L, int M, double r_c, boolean round){
 
         if(L/M <= r_c){
             throw new RuntimeException("L/M debe ser mayor exclusivo a r_c. Terminando ejecución");
@@ -309,26 +218,72 @@ public class CIM {
         // A esta altura, las particulas insertadas en la matriz deberían tener sus vecinos ya guardados.
         long totalTime = System.nanoTime() - startTime;
         System.out.println("Execution time: " + totalTime/1000000 + "ms\n");
-        for (Particle p : particleList){
+        /*for (Particle p : particleList){
             System.out.print(p.getIdx() + ":");
             for (Particle neighbour : p.getNeighbours()){
                 System.out.print(" " + neighbour.getIdx());
             }
             System.out.print("\n");
+        }*/
+        for(Particle p : particleList) {
+            System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: "
+                    + p.getY() + ")\n" + "---------------------");
+            for (Particle f : p.getNeighbours()) {
+                System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
+            }
+        }
+
+    }
+
+    private void BruteMethod(int N, double r, int L, int M, double r_c, boolean round){
+        List<Particle> particleList = new ArrayList<Particle>();
+        for(int i=0; i<N; i++) {
+            Particle p = new Particle(i, Math.random() * L, Math.random() * L, r);
+            particleList.add(p);
+        }
+        long startTime = System.nanoTime();
+        for(Particle p : particleList){
+            for(Particle k : particleList){
+                if(p.getIdx() != k.getIdx() && !p.getNeighbours().contains(k)){
+                    if(!round){
+                        if(p.isNeighbour(k, r_c)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
+                    else{
+                        if(p.isPeriodicNeighbour(k, r_c, L)){
+                            p.addNeighbour(k);
+                            k.addNeighbour(p);
+                        }
+                    }
+                }
+            }
+        }
+        long totalTime = System.nanoTime() - startTime;
+        System.out.println("Execution time: " + totalTime/1000000 + "ms\n");
+        for(Particle p : particleList) {
+            System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: "
+                    + p.getY() + ")\n" + "---------------------");
+            for (Particle f : p.getNeighbours()) {
+                System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
+            }
         }
     }
 
-
-
     public static void main(String[] args) {
-        boolean round = false;
+        boolean round = true;
         int N = CIM_PARTICLE_NUMBER;
         int L = CIM_LENGTH_SIDE;
         double r = CIM_PARTICLE_RADIUS_SIZE;
         int M = CIM_CELLS_PER_SIDE;
-        int r_c = CIM_INTERACTION_RADIUS;
+        double r_c = CIM_INTERACTION_RADIUS;
+        boolean brute = CIM_BRUTE;
         CIM cim = new CIM();
-        cim.CellIndexMethod(N, r, L, M, r_c, round);
+        if(!brute)
+            cim.CellIndexMethod(N, r, L, M, r_c, round);
+        else
+            cim.BruteMethod(N, r, L, M, r_c, round);
     }
 
 }
