@@ -66,7 +66,7 @@ public class CIM {
 
 
     }
-    private static final int CIM_LENGTH_SIDE = 20;
+    private static final int CIM_LENGTH_SIDE = 10;
     private static final int CIM_PARTICLE_NUMBER = 10;
     private static final double CIM_PARTICLE_RADIUS_SIZE = 0.25;
     private static final int CIM_INTERACTION_RADIUS = 1;
@@ -194,12 +194,11 @@ public class CIM {
                         p.addNeighbour(k);
                 }
             }
-            System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: " + p.getY()
-        + ")\n"
-            + "---------------------");
+            /*System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: "
+                    + p.getY() + ")\n" + "---------------------");
             for(Particle f : p.getNeighbours()){
                 System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
-            }
+            }*/
         }
 
     }
@@ -221,14 +220,19 @@ public class CIM {
         //tenemos un espacio de LxL, y habría que randomizar N posiciones
         //cada partícula es un par ordenado, con lo que habría que randomizar n posiciones para cada dimensión
 
-        //List<Particle> particleList = new ArrayList<Particle>();
+        List<Particle> particleList = new ArrayList<Particle>();
         List<List<List<Particle>>> particleMatrix = new ArrayList<>();
         initializeMatrix(particleMatrix, M);
         for(int i=0; i<N; i++) {
             Particle p = new Particle(i, Math.random() * L, Math.random() * L, r);
-            //particleList.add(p);
+            particleList.add(p);
             locateInMatrix(p, L, M, particleMatrix);
         }
+
+        // Se empieza a contabilizar el tiempo a partir de que se ejecuta el algoritmo,
+        // no en la generación de particulas. Creimos innecesario este último tiempo dado
+        // que es el mismo proceso para cualquier método comparativo.
+        long startTime = System.nanoTime();
 
         for(int i=0; i<M; i++) {
             for(int j=0; j<M; j++) {
@@ -244,7 +248,15 @@ public class CIM {
             }
         }
         // A esta altura, las particulas insertadas en la matriz deberían tener sus vecinos ya guardados.
-
+        long totalTime = System.nanoTime() - startTime;
+        System.out.println("Execution time: " + totalTime/1000000 + "ms\n");
+        for (Particle p : particleList){
+            System.out.print(p.getIdx() + ":");
+            for (Particle neighbour : p.getNeighbours()){
+                System.out.print(" " + neighbour.getIdx());
+            }
+            System.out.print("\n");
+        }
     }
 
 
