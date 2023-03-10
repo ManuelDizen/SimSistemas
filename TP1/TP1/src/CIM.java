@@ -43,14 +43,18 @@ public class CIM {
                 Particle k = particles.get(i);
                 if(!round){
                     if(p.isNeighbour(k, r_c)){
-                        p.addNeighbour(k);
-                        k.addNeighbour(p);
+                        if(!p.getNeighbours().contains(k))
+                            p.addNeighbour(k);
+                        if(!k.getNeighbours().contains(p))
+                            k.addNeighbour(p);
                     }
                 }
                 else{
                     if(p.isPeriodicNeighbour(k, r_c, L)){
-                        p.addNeighbour(k);
-                        k.addNeighbour(p);
+                        if(!p.getNeighbours().contains(k))
+                            p.addNeighbour(k);
+                        if(!k.getNeighbours().contains(p))
+                            k.addNeighbour(p);
                     }
                 }
             }
@@ -69,14 +73,18 @@ public class CIM {
                 for (Particle k : particleMatrix.get(rightAdjacentCellX).get(cellY)) {
                     if(!round){
                         if(p.isNeighbour(k, r_c)){
-                            p.addNeighbour(k);
-                            k.addNeighbour(p);
+                            if(!p.getNeighbours().contains(k))
+                                p.addNeighbour(k);
+                            if(!k.getNeighbours().contains(p))
+                                k.addNeighbour(p);
                         }
                     }
                     else{
                         if(p.isPeriodicNeighbour(k, r_c, L)){
-                            p.addNeighbour(k);
-                            k.addNeighbour(p);
+                            if(!p.getNeighbours().contains(k))
+                                p.addNeighbour(k);
+                            if(!k.getNeighbours().contains(p))
+                                k.addNeighbour(p);
                         }
                     }
                 }
@@ -96,14 +104,18 @@ public class CIM {
                 for (Particle k : particleMatrix.get(rightAdjacentCellX).get(bottomAdjacentCellY)) {
                     if(!round){
                         if(p.isNeighbour(k, r_c)){
-                            p.addNeighbour(k);
-                            k.addNeighbour(p);
+                            if(!p.getNeighbours().contains(k))
+                                p.addNeighbour(k);
+                            if(!k.getNeighbours().contains(p))
+                                k.addNeighbour(p);
                         }
                     }
                     else{
                         if(p.isPeriodicNeighbour(k, r_c, L)){
-                            p.addNeighbour(k);
-                            k.addNeighbour(p);
+                            if(!p.getNeighbours().contains(k))
+                                p.addNeighbour(k);
+                            if(!k.getNeighbours().contains(p))
+                                k.addNeighbour(p);
                         }
                     }
                 }
@@ -122,14 +134,18 @@ public class CIM {
                 for (Particle k : particleMatrix.get(cellX).get(bottomAdjacentCellY)) {
                     if(!round){
                         if(p.isNeighbour(k, r_c)){
-                            p.addNeighbour(k);
-                            k.addNeighbour(p);
+                            if(!p.getNeighbours().contains(k))
+                                p.addNeighbour(k);
+                            if(!k.getNeighbours().contains(p))
+                                k.addNeighbour(p);
                         }
                     }
                     else{
                         if(p.isPeriodicNeighbour(k, r_c, L)){
-                            p.addNeighbour(k);
-                            k.addNeighbour(p);
+                            if(!p.getNeighbours().contains(k))
+                                p.addNeighbour(k);
+                            if(!k.getNeighbours().contains(p))
+                                k.addNeighbour(p);
                         }
                     }
                 }
@@ -220,7 +236,7 @@ public class CIM {
 
     }
 
-    private long BruteMethod(List<Particle> particlesBrute, int N, double r, int L, int M, double r_c, boolean round,
+    private long BruteMethod(List<Particle> particlesBrute, int L, double r_c, boolean round,
                                        Queue<Particle> particles){
         //Particle p = new Particle(i, Math.random() * L, Math.random() * L, r);
         List<Particle> particleList = new ArrayList<>(particles);
@@ -293,51 +309,54 @@ public class CIM {
         }
     }
 
-    public static void main(String[] args) {
+   public static void main(String[] args) {
 
         // TODO: Cambiar generación random de particulas por las del archivo estático / dinámico
 
         CIM cim = new CIM();
 
-        List<Particle> particles;
-        List<Particle> particlesBrute;
+        List<Particle> particles = new ArrayList<>();
+        List<Particle> particlesBrute = new ArrayList<>();
         Queue<Particle> particleQueue = null;
         Map<Integer, List<Long>> timeCellMap = new HashMap<>();
-        Map<Integer, List<Long>> timeBruteMap = new HashMap<>();
+        Map<Integer, Long> timeBruteMap = new HashMap<>();
         long timeCell = 0;
         long timeBrute = 0;
 
         for(int i=10; i<=30; i+=10) {
             List<Long> timeCellList = new ArrayList<>();
-            List<Long> timeBruteList = new ArrayList<>();
+            Generator.generateInputFiles(i, 5);
+            List<Queue<Particle>> queueList = new ArrayList<>();
+            List<List<Particle>> brutes = new ArrayList<>();
+            timeBrute = 0;
+            for(int b=0; b<5; b++) {
+                try {
+                    particleQueue = InputParser.parseParticles(i, b);
+                    queueList.add(particleQueue);
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                particlesBrute = new ArrayList<>();
+                timeBrute += cim.BruteMethod(particlesBrute, CIM_LENGTH_SIDE,
+                        CIM_INTERACTION_RADIUS, CIM_ROUND, particleQueue);
+                brutes.add(particlesBrute);
+            }
+            timeBruteMap.put(i, timeBrute/5);
             for(int m=2; m<=10; m+=2) {
                 timeCell = 0;
-                timeBrute = 0;
                 for(int j=0; j<5; j++) {
-                    Generator.generateInputFile(i, j);
-                    try {
-                        particleQueue = InputParser.parseParticles(i, j);
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
                     particles = new ArrayList<>();
                     timeCell += cim.CellIndexMethod(particles, CIM_PARTICLE_NUMBER, CIM_PARTICLE_RADIUS_SIZE, CIM_LENGTH_SIDE,
-                            m, CIM_INTERACTION_RADIUS, CIM_ROUND, particleQueue);
-                    particlesBrute = new ArrayList<>();
-                    timeBrute += cim.BruteMethod(particlesBrute, CIM_PARTICLE_NUMBER, CIM_PARTICLE_RADIUS_SIZE, CIM_LENGTH_SIDE,
-                            m, CIM_INTERACTION_RADIUS, CIM_ROUND, particleQueue);
-                    cim.checkCalculation(particles, particlesBrute);
+                            m, CIM_INTERACTION_RADIUS, CIM_ROUND, queueList.get(j));
+                    cim.checkCalculation(particles, brutes.get(j));
                     Generator.generateOutputFile(particles, CIM_PARTICLE_NUMBER, j, CIM_INTERACTION_RADIUS, m);
-
                 }
-                timeCellList.add(timeCell);
-                timeBruteList.add(timeBrute);
+                timeCellList.add(timeCell/5);
+
             }
             timeCellMap.put(i, timeCellList);
-            timeBruteMap.put(i, timeBruteList);
         }
         Generator.generateResults(timeCellMap, timeBruteMap);
     }
-
 
 }
