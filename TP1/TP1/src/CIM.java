@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Queue;
 
 public class CIM {
-    static int CIM_LENGTH_SIDE = 10;
-    static int CIM_PARTICLE_NUMBER = 10;
+    static int CIM_LENGTH_SIDE = 20;
+    static int CIM_PARTICLE_NUMBER = 100;
     private static final double CIM_PARTICLE_RADIUS_SIZE = 0.25;
-    private static final double CIM_INTERACTION_RADIUS = 6;
+    private static final double CIM_INTERACTION_RADIUS = 1;
     private static final int CIM_CELLS_PER_SIDE = 5;
     private static final boolean CIM_BRUTE = true; // False = CIM, True = Brute
     private static final boolean CIM_ROUND = true;
@@ -33,7 +33,7 @@ public class CIM {
      */
 
     private void calculateNeighbours(List<Particle> particles, List<List<List<Particle>>> particleMatrix,
-                                     boolean round, int cellX, int cellY, double r_c, int L) {
+                                     boolean round, int cellX, int cellY, double r_c, int L, int M) {
         for(Particle p : particles) {
             for (int i = particles.indexOf(p) + 1; i < particles.size(); i++) {
                 /*
@@ -54,8 +54,8 @@ public class CIM {
                     }
                 }
             }
-            int rightAdjacentCellX = cellX+1 < CIM_CELLS_PER_SIDE? cellX+1 : (
-                        round && cellX+1 == CIM_CELLS_PER_SIDE? 0 : -1
+            int rightAdjacentCellX = cellX+1 < M? cellX+1 : (
+                        round && cellX+1 == M? 0 : -1
                     );
             /*
             |   |   |///|
@@ -81,8 +81,8 @@ public class CIM {
                     }
                 }
             }
-            int bottomAdjacentCellY = cellY+1 < CIM_CELLS_PER_SIDE? cellY+1 : (
-                    round && cellY+1 == CIM_CELLS_PER_SIDE? 0 : -1);
+            int bottomAdjacentCellY = cellY+1 < M? cellY+1 : (
+                    round && cellY+1 == M? 0 : -1);
             /*
             |   |   |   |
             |   | * |   |
@@ -144,7 +144,7 @@ public class CIM {
             |///|___|___|
              */
             int leftAdjacentCellX = cellX - 1 >= 0 ? cellX - 1 : (
-                    round && cellX - 1 < 0? CIM_CELLS_PER_SIDE - 1: -1
+                    round && cellX - 1 < 0? M - 1: -1
                     );
             if(leftAdjacentCellX >= 0 && bottomAdjacentCellY >= 0
                     && particleMatrix.get(leftAdjacentCellX).get(bottomAdjacentCellY) != null){
@@ -176,7 +176,7 @@ public class CIM {
         }
     }
 
-    private List<Particle> CellIndexMethod(int N, double r, int L, int M, double r_c, boolean round,
+    private long CellIndexMethod(List<Particle> particleList, int N, double r, int L, int M, double r_c, boolean round,
                                            Queue<Particle> particles){
 
         if(L/M <= r_c){
@@ -186,7 +186,6 @@ public class CIM {
         //cada partícula es un par ordenado, con lo que habría que randomizar n posiciones
         // para cada dimensión
 
-        List<Particle> particleList = new ArrayList<Particle>();
         List<List<List<Particle>>> particleMatrix = new ArrayList<>();
         initializeMatrix(particleMatrix, M);
         for(Particle p : particles) {
@@ -209,24 +208,19 @@ public class CIM {
                         double retVal = distX != 0 ? distX : (o1.getY() - o2.getY());
                         return retVal > 0 ? 1 : (retVal < 0 ? -1 : 0);
                     });
-                    calculateNeighbours(auxList, particleMatrix, round, i, j, r_c, L);
+                    calculateNeighbours(auxList, particleMatrix, round, i, j, r_c, L, M);
                 }
             }
         }
         // A esta altura, las particulas insertadas en la matriz deberían tener sus vecinos ya guardados.
-        long totalTime = System.nanoTime() - startTime;
-        System.out.println("Execution time: " + totalTime/1000 + "ms\n");
-        for(Particle p : particleList) {
-            System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: "
-                    + p.getY() + ")\n" + "---------------------");
-            for (Particle f : p.getNeighbours()) {
-                System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
-            }
-        }
-        return particleList;
+        long totalTime = (System.nanoTime() - startTime)/1000;
+        System.out.println("totaltime = " + totalTime);
+        //System.out.println("Execution time: " + totalTime/1000 + "ms\n");
+        return totalTime;
+
     }
 
-    private List<Particle> BruteMethod(int N, double r, int L, int M, double r_c, boolean round,
+    private long BruteMethod(List<Particle> particlesBrute, int N, double r, int L, int M, double r_c, boolean round,
                                        Queue<Particle> particles){
         //Particle p = new Particle(i, Math.random() * L, Math.random() * L, r);
         List<Particle> particleList = new ArrayList<>(particles);
@@ -249,17 +243,54 @@ public class CIM {
                 }
             }
         }
-        long totalTime = System.nanoTime() - startTime;
-        System.out.println("Execution time: " + totalTime/1000000 + "ms\n");
-        for(Particle p : particleList) {
-            System.out.println("Vecinos de la particula " + p.getIdx() + " (X: " + p.getX() + ", Y: "
-                    + p.getY() + ")\n" + "---------------------");
-            for (Particle f : p.getNeighbours()) {
-                System.out.println(f.getIdx() + " (X: " + f.getX() + ", Y: " + f.getY() + ")\n");
+
+        particlesBrute.addAll(particleList);
+
+        long totalTime = (System.nanoTime() - startTime)/1000;
+        //System.out.println("Execution time: " + totalTime/1000000 + "ms\n");
+
+        System.out.println("totaltime = " + totalTime);
+        return totalTime;
+    }
+
+    private void checkCalculation(List<Particle> particles, List<Particle> particlesBrute) {
+        //System.out.println("CHECK CALCULATION");
+        for(int i=0; i<particles.size(); i++) {
+            Particle current = particles.get(i);
+            //System.out.println("checking " + i);
+            if(current.getIdx() == particlesBrute.get(i).getIdx()) {
+                for(Particle n : current.getNeighbours()) {
+                    //System.out.println("neighbour: " + n.getIdx());
+                    boolean found = false;
+                    for(Particle b : particlesBrute.get(i).getNeighbours()) {
+                        //System.out.println("entering with b: " + b.getIdx());
+                        if(n.getIdx() == b.getIdx()) {
+                            found = true;
+                            //System.out.println("found!");
+                            break;
+                        }
+                    }
+                    if(!found)
+                        throw new RuntimeException("Error en el cálculo");
+                }
+            } else {
+                System.out.println("hello");
+                int j=0;
+                while(particlesBrute.get(j).getIdx() != current.getIdx())
+                    j++;
+                for(Particle n : current.getNeighbours()) {
+                    boolean found = false;
+                    for(Particle b : particlesBrute.get(j).getNeighbours()) {
+                        if(n.getIdx() == b.getIdx()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                        throw new RuntimeException("Error en el cálculo");
+                }
             }
         }
-
-        return particleList;
     }
 
     public static void main(String[] args) {
@@ -269,22 +300,44 @@ public class CIM {
         CIM cim = new CIM();
 
         List<Particle> particles;
-
+        List<Particle> particlesBrute;
         Queue<Particle> particleQueue = null;
-        try {
-            particleQueue = InputParser.parseParticles();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+        Map<Integer, List<Long>> timeCellMap = new HashMap<>();
+        Map<Integer, List<Long>> timeBruteMap = new HashMap<>();
+        long timeCell = 0;
+        long timeBrute = 0;
+
+        for(int i=10; i<=30; i+=10) {
+            List<Long> timeCellList = new ArrayList<>();
+            List<Long> timeBruteList = new ArrayList<>();
+            for(int m=2; m<=10; m+=2) {
+                timeCell = 0;
+                timeBrute = 0;
+                for(int j=0; j<5; j++) {
+                    Generator.generateInputFile(i, j);
+                    try {
+                        particleQueue = InputParser.parseParticles(i, j);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    particles = new ArrayList<>();
+                    timeCell += cim.CellIndexMethod(particles, CIM_PARTICLE_NUMBER, CIM_PARTICLE_RADIUS_SIZE, CIM_LENGTH_SIDE,
+                            m, CIM_INTERACTION_RADIUS, CIM_ROUND, particleQueue);
+                    particlesBrute = new ArrayList<>();
+                    timeBrute += cim.BruteMethod(particlesBrute, CIM_PARTICLE_NUMBER, CIM_PARTICLE_RADIUS_SIZE, CIM_LENGTH_SIDE,
+                            m, CIM_INTERACTION_RADIUS, CIM_ROUND, particleQueue);
+                    cim.checkCalculation(particles, particlesBrute);
+                    Generator.generateOutputFile(particles, CIM_PARTICLE_NUMBER, j, CIM_INTERACTION_RADIUS, m);
+
+                }
+                timeCellList.add(timeCell);
+                timeBruteList.add(timeBrute);
+            }
+            timeCellMap.put(i, timeCellList);
+            timeBruteMap.put(i, timeBruteList);
         }
-
-        if(!CIM_BRUTE)
-            particles = cim.CellIndexMethod(CIM_PARTICLE_NUMBER, CIM_PARTICLE_RADIUS_SIZE, CIM_LENGTH_SIDE,
-                    CIM_CELLS_PER_SIDE, CIM_INTERACTION_RADIUS, CIM_ROUND, particleQueue);
-        else
-            particles = cim.BruteMethod(CIM_PARTICLE_NUMBER, CIM_PARTICLE_RADIUS_SIZE, CIM_LENGTH_SIDE,
-                    CIM_CELLS_PER_SIDE, CIM_INTERACTION_RADIUS, CIM_ROUND, particleQueue);
-
-        Generator.generateOutputFile(particles, CIM_PARTICLE_NUMBER, CIM_INTERACTION_RADIUS, CIM_CELLS_PER_SIDE);
+        Generator.generateResults(timeCellMap, timeBruteMap);
     }
+
 
 }
