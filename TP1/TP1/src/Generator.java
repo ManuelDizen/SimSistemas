@@ -45,7 +45,7 @@ public class Generator {
         }
     }
 
-    public static void generateResults(Map<Integer, List<Long>> cellTime, Map<Integer, List<Long>> bruteTime) {
+   public static void generateResults(Map<Integer, List<Long>> cellTime, Map<Integer, Long> bruteTime) {
         try(FileWriter fw = new FileWriter("Resultados.txt", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
@@ -56,14 +56,16 @@ public class Generator {
             for(int i=10; i<=30; i+=10) {
 
                 List<Long> cellList = cellTime.get(i);
-                List<Long> bruteList = bruteTime.get(i);
+                Long brute = bruteTime.get(i);
 
                 out.println("\nCantidad de partículas: " + i);
 
-                out.println("\n\t\t\tCell Index Method\t-\tBrute Force Method: ");
+                out.println("\nFuerza Bruta: " + brute);
+
+                out.println("\nCell Index Method: ");
 
                 for(int j=1; j<=cellList.size(); j++) {
-                    out.println("\nGrilla " + j*2 + "x" + j*2 + ":\t\t" + cellList.get(j-1) + "\t\t\t\t\t\t\t" + bruteList.get(j-1));
+                    out.println("\nGrilla " + j*2 + "x" + j*2 + ":\t\t" + cellList.get(j-1));
                 }
 
             }
@@ -82,4 +84,6 @@ public class Generator {
             e.printStackTrace();
         }
     }
+}
+
 }
