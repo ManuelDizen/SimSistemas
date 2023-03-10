@@ -6,9 +6,9 @@ import java.util.List;
 
 public class Generator {
 
-    public static void generateOutputFile(List<Particle> particles, int N, double r_c){
+    public static void generateOutputFile(List<Particle> particles, int N, double r_c, int M){
         try(FileWriter fw = new FileWriter("Vecinos-" + "N:" + N + "-" +
-                "rc:" + r_c + ".txt", false);
+                "rc:" + r_c + "-M:" + M + ".txt", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {

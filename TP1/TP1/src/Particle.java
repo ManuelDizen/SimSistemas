@@ -16,6 +16,14 @@ public class Particle {
     }
 
     private int idx;
+    private double unknown;
+
+    public Particle(int idx, double r, double unknown){
+        this.idx = idx;
+        this.r = r;
+        this.unknown = unknown;
+        this.neighbours = new ArrayList<>();
+    }
 
     public Particle(int idx, double x, double y, double r){
         this.idx = idx;
