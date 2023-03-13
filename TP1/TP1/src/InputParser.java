@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Scanner;
 
@@ -37,7 +38,7 @@ public class InputParser {
     }
     
     private static void dynamicSystemParse(int N, int file) throws FileNotFoundException {
-        File dynamicFile = new File("/home/manuel/Desktop/SimSistemas/TP1/Dynamic" + N + "." + file + ".txt");
+        File dynamicFile = new File("/home/manuel/Desktop/SimSistemas/TP1/TP1/Dynamic" + N + "." + file + ".txt");
         Scanner sc = new Scanner(dynamicFile).useLocale(Locale.US);
         sc.nextInt();
         for (int i = 0; i < CIM.CIM_PARTICLE_NUMBER; i++){
