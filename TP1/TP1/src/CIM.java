@@ -164,7 +164,7 @@ public class CIM {
                     );
             if(leftAdjacentCellX >= 0 && bottomAdjacentCellY >= 0
                     && particleMatrix.get(leftAdjacentCellX).get(bottomAdjacentCellY) != null){
-                for (Particle k : particleMatrix.get(rightAdjacentCellX).get(bottomAdjacentCellY)) {
+                for (Particle k : particleMatrix.get(leftAdjacentCellX).get(bottomAdjacentCellY)) {
                     if(!round){
                         if(p.isNeighbour(k, r_c)){
                             p.addNeighbour(k);
