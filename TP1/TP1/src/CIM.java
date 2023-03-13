@@ -323,8 +323,9 @@ public class CIM {
         long timeCell = 0;
         long timeBrute = 0;
 
-        for(int i=10; i<=30; i+=10) {
-            List<Long> timeCellList = new ArrayList<>();
+        for(int i=10; i<=200; i+=10) {
+            if(i<50||i==80||i>190) {
+                List<Long> timeCellList = new ArrayList<>();
             Generator.generateInputFiles(i, 5);
             List<Queue<Particle>> queueList = new ArrayList<>();
             List<List<Particle>> brutes = new ArrayList<>();
@@ -354,7 +355,8 @@ public class CIM {
                 timeCellList.add(timeCell/5);
 
             }
-            timeCellMap.put(i, timeCellList);
+            timeCellMap.put(i, timeCellList);   
+            }
         }
         Generator.generateResults(timeCellMap, timeBruteMap);
     }
