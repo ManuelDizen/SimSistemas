@@ -55,19 +55,21 @@ public class Generator {
             out.println("Espacio de lado L=20, radio de interacción r_c=1, radio de partícula r=0.25");
             out.println("Averiguamos el tiempo promedio (de 5 pasadas con input distinto) en microsegundos\npara distintas cantidades de partículas y distintas distribuciones de grilla,\npara ambos métodos");
 
-            for(int i=10; i<=30; i+=10) {
+            for(int i=10; i<=200; i+=10) {
+                
+                if(i<50||i==80||i>190) {
+                    List<Long> cellList = cellTime.get(i);
+                    Long brute = bruteTime.get(i);
 
-                List<Long> cellList = cellTime.get(i);
-                Long brute = bruteTime.get(i);
+                    out.println("\nCantidad de partículas: " + i);
 
-                out.println("\nCantidad de partículas: " + i);
+                    out.println("\nFuerza Bruta: " + brute);
 
-                out.println("\nFuerza Bruta: " + brute);
+                    out.println("\nCell Index Method: ");
 
-                out.println("\nCell Index Method: ");
-
-                for(int j=1; j<=cellList.size(); j++) {
-                    out.println("\nGrilla " + j*2 + "x" + j*2 + ":\t\t" + cellList.get(j-1));
+                    for(int j=1; j<=cellList.size(); j++) {
+                        out.println("\nGrilla " + j*2 + "x" + j*2 + ":\t\t" + cellList.get(j-1));
+                    }
                 }
 
             }
