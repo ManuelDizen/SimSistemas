@@ -6,20 +6,22 @@ import java.util.List;
 
 public class Generator {
 
-    public static void generateInputFile(int N, int i) {
-        try(FileWriter fw = new FileWriter("Dynamic" + N + "." + i + ".txt", false);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter out = new PrintWriter(bw))
-        {
-            out.println(0);
-            for(int j=0; j<N; j++) {
-                StringBuilder aux = new StringBuilder();
-                aux.append(Math.random()* CIM.CIM_LENGTH_SIDE).append("\t").append(Math.random()*CIM.CIM_LENGTH_SIDE);
-                out.println(aux.toString());
+    public static void generateInputFiles(int N, int cant) {
+        for(int i=0; i<cant; i++) {
+            try(FileWriter fw = new FileWriter("Dynamic" + N + "." + i + ".txt", false);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw))
+            {
+                out.println(0);
+                for(int j=0; j<N; j++) {
+                    StringBuilder aux = new StringBuilder();
+                    aux.append(Math.random()* CIM.CIM_LENGTH_SIDE).append("\t").append(Math.random()*CIM.CIM_LENGTH_SIDE);
+                    out.println(aux.toString());
+                }
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -45,7 +47,7 @@ public class Generator {
         }
     }
 
-   public static void generateResults(Map<Integer, List<Long>> cellTime, Map<Integer, Long> bruteTime) {
+    public static void generateResults(Map<Integer, List<Long>> cellTime, Map<Integer, Long> bruteTime) {
         try(FileWriter fw = new FileWriter("Resultados.txt", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
@@ -84,6 +86,4 @@ public class Generator {
             e.printStackTrace();
         }
     }
-}
-
 }
