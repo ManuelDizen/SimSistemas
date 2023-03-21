@@ -10,25 +10,25 @@ public class Particle {
     private double angle;
     private final List<Particle> neighbours;
     private double eta;
-
-    public void setEta(double eta){
-        this.eta = eta;
-    }
-
-    public int getIdx() {
-        return idx;
-    }
-
-    public void setIdx(int idx) {
-        this.idx = idx;
-    }
-
     private int idx;
 
     public Particle(int idx, double angle){
         this.idx = idx;
         this.angle = angle;
         this.neighbours = new ArrayList<>();
+    }
+
+    public Particle(Particle other){
+        this.idx = other.getIdx();
+        this.angle = other.getAngle();
+        this.neighbours = other.getNeighbours();
+        this.x = other.getX();
+        this.y = other.getY();
+        this.eta = other.eta;
+    }
+
+    public int getIdx() {
+        return idx;
     }
 
     public double getX() {
@@ -51,24 +51,12 @@ public class Particle {
         return angle;
     }
 
-    public  void setAngle(double angle) {
-        this.angle = angle;
-    }
-
     public List<Particle> getNeighbours() {
         return neighbours;
     }
 
-    public void removeNeighbours(){
-        this.neighbours.clear();
-    }
-
     public void addNeighbour(Particle p) {
         this.neighbours.add(p);
-    }
-
-    public void addNeighbours(List<Particle> pList) {
-        this.neighbours.addAll(pList);
     }
 
     public boolean isNeighbour(Particle p, double r_c){
@@ -107,6 +95,13 @@ public class Particle {
         double randomFactor = ((eta/2)*(Math.random())*(Math.random() <= 0.5? -1:1));
         val += randomFactor;
         this.angle = val;
+    }
+
+    public void updatePosition(double v, double L){
+        double dx = v * Math.cos(this.angle);
+        double dy = v * Math.sin(this.angle);
+        this.x = (L+this.x + dx)%L;
+        this.y = (L+this.y + dy)%L;
     }
 
 

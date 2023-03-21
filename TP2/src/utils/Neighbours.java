@@ -188,7 +188,8 @@ public class Neighbours {
         }
     }
 
-    public static void CellIndexMethod(List<Particle> particles, int N, int L, int M, double r_c, boolean round){
+    public static void CellIndexMethod(List<Particle> particles, int N, int L, int M,
+                                       double r_c, boolean round){
 
         if(L/M <= r_c){
             throw new RuntimeException("L/M debe ser mayor exclusivo a r_c. Terminando ejecución");

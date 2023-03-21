@@ -1,7 +1,10 @@
 import models.Particle;
 import utils.Neighbours;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OffLattice {
@@ -16,6 +19,8 @@ public class OffLattice {
     private static final double V = 0.03;
     private static final int dT = 1;
 
+    private static final int iterations = 1000;
+
     public OffLattice(double eta, int N, int L) {
         this.eta = eta;
         this.N = N;
@@ -27,24 +32,8 @@ public class OffLattice {
         return L;
     }
 
-    public void setL(int l) {
-        L = l;
-    }
-
     public int getN() {
         return N;
-    }
-
-    public void setN(int n) {
-        N = n;
-    }
-
-    public double getEta() {
-        return eta;
-    }
-
-    public void setEta(double eta) {
-        this.eta = eta;
     }
 
     private void generateParticles() {
@@ -76,7 +65,7 @@ public class OffLattice {
     }
 
     public static void main(String[] args) {
-
+        // Argv[0]=eta, argv[1]=N, argv[2]=L
         OffLattice offLattice = new OffLattice(Double.parseDouble(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 
         if (args.length != 3) {
@@ -90,14 +79,44 @@ public class OffLattice {
             System.out.printf(particle.getIdx() + ": " + particle.getX() + ", " + particle.getY() + ", angle: " + particle.getAngle()*360/(2*Math.PI) + "\n");
         }
 
+        try(FileWriter output = new FileWriter("output.txt")) {
+            for (int i = 0; i < iterations; i++) {
+                output.write(offLattice.N + " - Iteration: " + i + "\n");
+/*
+                System.out.println(offLattice.N + " - Iteration: " + i + "\n");
+*/
+                for(Particle p : particles){
+                    output.write(String.format("%d %f %f %f\n", p.getIdx(),
+                            p.getX(), p.getY(), p.getAngle()));
+                    /*System.out.println(String.format("%d %f %f %f\n", p.getIdx(),
+                            p.getX(), p.getY(), p.getAngle()));*/
+                }
+                // TODO: Guardar en un archivo el output necesario
+                // (1) Dejo calculados los vecinos
+                Neighbours.CellIndexMethod(particles, offLattice.getN(), offLattice.getL(),
+                        2, R_C, true);
 
+                //(2) Con vecinos calculados, puedo calcular nuevas direcciones
+                // Nota: debemos tomar una instancia adicional de particles para no perder la "foto"
+                /*
+                Nota explicativa sobre la nota anterior: No es necesario porque la serie de pasos es:
+                    1. Calcular direcciones nuevas antes de mover cualquier particula
+                    2. Mover en función del ÁNGULO y no de posición
 
+                 Al no ser pertinente la posición, y el ángulo ya cambió, no es necesaria uan estructura
+                 auxiliar
+                 */
 
-
-
-
-
-
+                for (Particle p : particles) {
+                    p.updateAngle();
+                    p.updatePosition(V, offLattice.getL());
+                }
+            }
+        }
+        catch(IOException e){
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
         //Modelar un paso temporal dt = 1
 
     }
