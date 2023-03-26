@@ -77,7 +77,9 @@ public class OffLattice {
         //Generar N partículas aleatorias (posición, ángulo)
         offLattice.generateParticles();
 
-        try(FileWriter output = new FileWriter("output.txt")) {
+        String fileName = "output_N=" + offLattice.N + "_L=" + offLattice.L + "_eta=" + offLattice.eta + ".txt";
+
+        try(FileWriter output = new FileWriter(fileName)) {
             for (int i = 0; i < iterations; i++) {
                 setHeaders(output, offLattice.N, i);
                 for(Particle p : particles){
