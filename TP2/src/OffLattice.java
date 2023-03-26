@@ -19,6 +19,8 @@ public class OffLattice {
     private static final double V = 0.03;
     private static final int dT = 1;
 
+    private static final int radius = 0;
+
     private static final int iterations = 1000;
 
     public OffLattice(double eta, int N, int L) {
@@ -75,21 +77,12 @@ public class OffLattice {
         //Generar N partículas aleatorias (posición, ángulo)
         offLattice.generateParticles();
 
-        for(Particle particle : particles) {
-            System.out.printf(particle.getIdx() + ": " + particle.getX() + ", " + particle.getY() + ", angle: " + particle.getAngle()*360/(2*Math.PI) + "\n");
-        }
-
         try(FileWriter output = new FileWriter("output.txt")) {
             for (int i = 0; i < iterations; i++) {
-                output.write(offLattice.N + " - Iteration: " + i + "\n");
-/*
-                System.out.println(offLattice.N + " - Iteration: " + i + "\n");
-*/
+                setHeaders(output, offLattice.N, i);
                 for(Particle p : particles){
-                    output.write(String.format("%d %f %f %f\n", p.getIdx(),
-                            p.getX(), p.getY(), p.getAngle()));
-                    /*System.out.println(String.format("%d %f %f %f\n", p.getIdx(),
-                            p.getX(), p.getY(), p.getAngle()));*/
+                    output.write(String.format("%d %f %f %f %f %f\n", p.getIdx(),
+                            p.getX(), p.getY(), 0*1.0, p.getAngle(), radius*1.0));
                 }
                 // TODO: Guardar en un archivo el output necesario
                 // (1) Dejo calculados los vecinos
@@ -121,4 +114,19 @@ public class OffLattice {
 
     }
 
+    private static void setHeaders(FileWriter output, int N, int i){
+        try {
+            /*output.write(String.format("%d atoms\n1 atom types\n\n", N));
+            output.write(String.format("0.000000 %f xlo xhi\n" +
+                            "0.000000 %f ylo yhi\n" +
+                            "0.000000 %f zlo zhi\n",
+                    L*1.0, L*1.0, L*1.0));
+            output.write(String.format("\nAtoms\n\n"));*/
+            output.write(String.format("%d\nFrame %d\n", N, i));
+        }
+        catch(IOException e){
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+    }
 }
