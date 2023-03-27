@@ -1,6 +1,7 @@
 import models.Particle;
 import utils.Neighbours;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class OffLattice {
         this.eta = eta;
         this.N = N;
         this.L = L;
-        this.M = (int) Math.floor(L/4.0);
+        this.M = 5;//(int) Math.floor(L/4.0);
         this.particles = new ArrayList<>();
     }
 
@@ -54,6 +55,7 @@ public class OffLattice {
             double y = Math.random() * L;
             particle.setX(x);
             particle.setY(y);
+            particle.setEta(eta);
             this.particles.add(particle);
         }
     }
@@ -70,6 +72,18 @@ public class OffLattice {
 
     }
 
+    private static double calculateOrder(int N) {
+        double cos = 0;
+        double sin = 0;
+        for(Particle p : particles) {
+            cos += V*Math.cos(p.getAngle());
+            sin += V*Math.sin(p.getAngle());
+        }
+        double order = Math.sqrt(Math.pow(cos, 2) + Math.pow(sin, 2));
+        return (Math.abs(order) / (N * V));
+    }
+
+
     public static void main(String[] args) {
         // Argv[0]=eta, argv[1]=N, argv[2]=L
         OffLattice offLattice = new OffLattice(Double.parseDouble(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
@@ -82,24 +96,33 @@ public class OffLattice {
 
         String fileName = "output_N=" + offLattice.N + "_L=" + offLattice.L + "_eta=" +
                 offLattice.eta + ".txt";
+        String vaFileName = "va_output_N" + offLattice.N + "_L" + offLattice.L + "_eta=" +
+                offLattice.eta + ".txt";
 
-        try(FileWriter output = new FileWriter(fileName)) {
-            for (int i = 0; i < iterations; i++) {
-                System.out.println(i + "\n");
-                setHeaders(output, offLattice.N, i);
-                for(Particle p : particles){
-                    output.write(String.format("%d %f %f %f %f %f %f %f\n", p.getIdx(),
-                            p.getX(), p.getY(), 0*1.0,
-                            p.getVx(), p.getVy(),
-                            p.getAngle(), radius*1.0));
-                }
-                Neighbours.CellIndexMethod(particles, offLattice.getN(), offLattice.getL(),
-                        offLattice.getM(), R_C, true);
 
-                for (Particle p : particles) {
-                    p.updateAngle();
-                    p.updatePosition(V, offLattice.getL());
+        try(FileWriter output = new FileWriter(new File("C:\\Users\\Franco De Simone\\Documents\\SS\\SimSistemas\\TP2\\src\\utils", fileName))) {
+            try(FileWriter vaOutput = new FileWriter(new File("C:\\Users\\Franco De Simone\\Documents\\SS\\SimSistemas\\TP2\\src\\utils", vaFileName))) {
+                for (int i = 0; i < iterations; i++) {
+                    System.out.println(i + "\n");
+                    setHeaders(output, offLattice.N, i);
+                    for(Particle p : particles){
+                        output.write(String.format("%d %f %f %f %f %f %f %f\n", p.getIdx(),
+                                p.getX(), p.getY(), 0*1.0,
+                                p.getVx(), p.getVy(),
+                                p.getAngle(), radius*1.0));
+                    }
+                    vaOutput.write(String.format("%f\n", calculateOrder(offLattice.getN())));
+                    Neighbours.CellIndexMethod(particles, offLattice.getN(), offLattice.getL(),
+                            offLattice.getM(), R_C, true);
+
+                    for (Particle p : particles) {
+                        p.updateAngle();
+                        p.updatePosition(V, offLattice.getL());
+                    }
                 }
+            } catch(IOException e){
+                System.out.println(e.getMessage());
+                System.exit(1);
             }
         }
         catch(IOException e){

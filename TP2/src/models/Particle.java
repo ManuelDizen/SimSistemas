@@ -65,6 +65,8 @@ public class Particle {
         this.y = y;
     }
 
+    public void setEta(double eta) { this.eta = eta; }
+
     public double getAngle() {
         return angle;
     }
