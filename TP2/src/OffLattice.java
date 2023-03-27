@@ -29,7 +29,7 @@ public class OffLattice {
         this.eta = eta;
         this.N = N;
         this.L = L;
-        this.M = 5;//(int) Math.floor(L/4.0);
+        this.M = (int) Math.floor(L/2.0);
         this.particles = new ArrayList<>();
     }
 
