@@ -7,15 +7,21 @@ public class Particle {
 
     private double x;
     private double y;
+    private double vx;
+    private double vy;
+    private double speed;
     private double angle;
     private final List<Particle> neighbours;
     private double eta;
     private int idx;
 
-    public Particle(int idx, double angle){
+    public Particle(int idx, double angle, double speed){
         this.idx = idx;
         this.angle = angle;
         this.neighbours = new ArrayList<>();
+        this.speed = speed;
+        this.vx = Math.cos(angle)* speed;
+        this.vy = Math.sin(angle)* speed;
     }
 
     public Particle(Particle other){
@@ -25,6 +31,18 @@ public class Particle {
         this.x = other.getX();
         this.y = other.getY();
         this.eta = other.eta;
+    }
+
+    public double getVx() {
+        return vx;
+    }
+
+    public double getVy() {
+        return vy;
+    }
+
+    public double getSpeed() {
+        return speed;
     }
 
     public int getIdx() {
@@ -100,9 +118,9 @@ public class Particle {
     public void updatePosition(double v, double L){
         double dx = v * Math.cos(this.angle);
         double dy = v * Math.sin(this.angle);
+        this.vx = dx;
+        this.vy = dy;
         this.x = (L+this.x + dx)%L;
         this.y = (L+this.y + dy)%L;
     }
-
-
 }

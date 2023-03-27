@@ -14,6 +14,7 @@ public class OffLattice {
 
     private int L;
     private int N;
+    private int M;
     private double eta;
     private static final double R_C = 1.0;
     private static final double V = 0.03;
@@ -27,6 +28,7 @@ public class OffLattice {
         this.eta = eta;
         this.N = N;
         this.L = L;
+        this.M = (int) Math.floor(L/4.0);
         this.particles = new ArrayList<>();
     }
 
@@ -37,15 +39,17 @@ public class OffLattice {
     public int getN() {
         return N;
     }
+    public int getM(){return M;}
 
-    private void generateParticles() {
+    private void generateParticles(double V) {
 
         int N = getN();
         double L = getL();
 
         for(int i=0; i<N; i++) {
-            double angle = Math.random() * FULL_ANGLE;
-            Particle particle = new Particle(i, angle);
+            //double angle = Math.random() * FULL_ANGLE;
+            double angle = Math.random() * Math.PI * (Math.random() < 0.5? -1:1);
+            Particle particle = new Particle(i, angle, V);
             double x = Math.random() * L;
             double y = Math.random() * L;
             particle.setX(x);
@@ -74,33 +78,23 @@ public class OffLattice {
             System.out.println("Usage: java SelfPropelledSystem <eta> <particle_count> <space_size>");
             System.exit(1);
         }
-        //Generar N partículas aleatorias (posición, ángulo)
-        offLattice.generateParticles();
+        offLattice.generateParticles(V);
 
-        String fileName = "output_N=" + offLattice.N + "_L=" + offLattice.L + "_eta=" + offLattice.eta + ".txt";
+        String fileName = "output_N=" + offLattice.N + "_L=" + offLattice.L + "_eta=" +
+                offLattice.eta + ".txt";
 
         try(FileWriter output = new FileWriter(fileName)) {
             for (int i = 0; i < iterations; i++) {
+                System.out.println(i + "\n");
                 setHeaders(output, offLattice.N, i);
                 for(Particle p : particles){
-                    output.write(String.format("%d %f %f %f %f %f\n", p.getIdx(),
-                            p.getX(), p.getY(), 0*1.0, p.getAngle(), radius*1.0));
+                    output.write(String.format("%d %f %f %f %f %f %f %f\n", p.getIdx(),
+                            p.getX(), p.getY(), 0*1.0,
+                            p.getVx(), p.getVy(),
+                            p.getAngle(), radius*1.0));
                 }
-                // TODO: Guardar en un archivo el output necesario
-                // (1) Dejo calculados los vecinos
                 Neighbours.CellIndexMethod(particles, offLattice.getN(), offLattice.getL(),
-                        2, R_C, true);
-
-                //(2) Con vecinos calculados, puedo calcular nuevas direcciones
-                // Nota: debemos tomar una instancia adicional de particles para no perder la "foto"
-                /*
-                Nota explicativa sobre la nota anterior: No es necesario porque la serie de pasos es:
-                    1. Calcular direcciones nuevas antes de mover cualquier particula
-                    2. Mover en función del ÁNGULO y no de posición
-
-                 Al no ser pertinente la posición, y el ángulo ya cambió, no es necesaria uan estructura
-                 auxiliar
-                 */
+                        offLattice.getM(), R_C, true);
 
                 for (Particle p : particles) {
                     p.updateAngle();
@@ -112,18 +106,11 @@ public class OffLattice {
             System.out.println(e.getMessage());
             System.exit(1);
         }
-        //Modelar un paso temporal dt = 1
 
     }
 
     private static void setHeaders(FileWriter output, int N, int i){
         try {
-            /*output.write(String.format("%d atoms\n1 atom types\n\n", N));
-            output.write(String.format("0.000000 %f xlo xhi\n" +
-                            "0.000000 %f ylo yhi\n" +
-                            "0.000000 %f zlo zhi\n",
-                    L*1.0, L*1.0, L*1.0));
-            output.write(String.format("\nAtoms\n\n"));*/
             output.write(String.format("%d\nFrame %d\n", N, i));
         }
         catch(IOException e){
