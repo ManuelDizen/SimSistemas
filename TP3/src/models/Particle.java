@@ -96,4 +96,48 @@ public class Particle {
         this.x = (L+this.x + dx)%L;
         this.y = (L+this.y + dy)%L;
     }
+
+    public double timeToXWallBounce(double x_wall_coor){
+        if(this.vx > 0){
+            return (x_wall_coor - this.radius - this.x)/this.vx;
+        }
+        else if(this.vx < 0){
+            return (0 + this.radius - this.x)/this.vx;
+        }
+        else{
+            // vx == 0
+            return -1;
+        }
+    }
+
+    public double timeToYWallBounce(double y_wall_coor){
+        if(this.vy > 0){
+            return (y_wall_coor - this.radius - this.y)/this.vy;
+        }
+        else if(this.vy < 0){
+            return (0 + this.radius -this.y)/this.vy;
+        }
+        else{
+            // vy == 0
+            return -1;
+        }
+    }
+
+    public double timeToParticleCollision(Particle other){
+        double dvx = other.vx - this.vx;
+        double dvy = other.vy-this.vy;
+        double dx = other.x - this.x;
+        double dy = other.y-this.y;
+        double dvdr = (dvx*dx) + (dvy*dy);
+        double dvdv = Math.pow(dvx, 2) + Math.pow(dvy, 2);
+        double drdr = Math.pow(dx, 2) + Math.pow(dy,2);
+        if(dvdr >= 0) return -1;
+        double d = Math.pow(dvdr, 2) -
+                (dvdv *(drdr - (Math.pow(this.radius + other.radius,2))));
+        if(d < 0) return -1;
+        return (dvdr + Math.pow(d, 0.5)) / (dvdv * -1);
+    }
+
+
+
 }

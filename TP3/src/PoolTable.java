@@ -1,4 +1,3 @@
-import com.sun.xml.internal.ws.wsdl.writer.document.Part;
 import models.Particle;
 
 import java.util.ArrayList;
@@ -47,9 +46,9 @@ public class PoolTable {
 
         //2da fila
         particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + MAX_EPSILON/2,
-                initial_triangle_y + BALL_RADIUS + MAX_EPSILON/2, 0, 0, 8, BALL_RADIUS, MASS);
+                initial_triangle_y + BALL_RADIUS + MAX_EPSILON/2, 0, 0, 8, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + MAX_EPSILON/2,
-                initial_triangle_y - BALL_RADIUS + MAX_EPSILON/2, 0, 0, 9, BALL_RADIUS, MASS);
+                initial_triangle_y - BALL_RADIUS + MAX_EPSILON/2, 0, 0, 9, BALL_RADIUS, MASS));
 
         // 3ra fila
         particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + MAX_EPSILON/2,
@@ -84,8 +83,10 @@ public class PoolTable {
     }
 
     public static void main(String[] args) {
+        // args[0] = initial y position for white ball
         PoolTable table = new PoolTable(Double.parseDouble(args[0]));
         table.generateParticles();
+
     }
 
 }
