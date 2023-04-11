@@ -18,6 +18,8 @@ public class Particle {
     private double radius;
 
     private double mass;
+    private int collision_n = 0; // Sugerencia de bibliografía para saber si una colisión calculada
+                             // sigue siendo válida
 
     public Particle(double x, double y, double vx, double vy, int idx, double radius, double mass) {
         this.x = x;
@@ -67,7 +69,7 @@ public class Particle {
         return angle;
     }
 
-
+/*
     public boolean isNeighbour(Particle p, double r_c){
         return Math.sqrt(Math.pow(this.getX() - p.getX(), 2) +
                 Math.pow(this.getY() - p.getY(), 2))
@@ -96,6 +98,8 @@ public class Particle {
         this.x = (L+this.x + dx)%L;
         this.y = (L+this.y + dy)%L;
     }
+*/
+    // Time calculation functions
 
     public double timeToXWallBounce(double x_wall_coor){
         if(this.vx > 0){
@@ -139,5 +143,39 @@ public class Particle {
     }
 
 
+    public double getMass() {
+        return mass;
+    }
 
+    public void setMass(double mass) {
+        this.mass = mass;
+    }
+
+    public void bounceWithVerticalWall(){
+        this.vx = -this.vx;
+        this.collision_n++;
+    }
+
+    public void bounceWithHorizontalWall(){
+        this.vy = -this.vy;
+        this.collision_n++;
+    }
+
+    public void bounceWithParticle(Particle other){
+        double dvx = other.vx - this.vx;
+        double dvy = other.vy-this.vy;
+        double dx = other.x - this.x;
+        double dy = other.y-this.y;
+        double dvdr = (dvx*dx) + (dvy*dy);
+        double sigma = Math.pow(this.radius + other.radius,2);
+        double J = (2*this.mass*other.mass*(dvdr))/(sigma* (this.mass + other.mass));
+        double Jx = (J*dx)/sigma;
+        double Jy = (J*dy)/sigma;
+        this.vx = this.vx + (Jx/this.mass); // vxi
+        this.vy = this.vy + (Jy/this.mass); // vyi
+        other.vx = other.vx - (Jx/other.mass);
+        other.vy = other.vy - (Jy/other.mass);
+
+        this.collision_n++;
+    }
 }
