@@ -37,6 +37,10 @@ public class Collision implements Comparable<Collision> {
         return t;
     }
 
+    public void elapse(double time) {
+        this.t -= time;
+    }
+
     public boolean isValidCollision(int collision_n_1, int collision_n_2){
         return (this.collision_n_1 == collision_n_1 || this.collision_n_1 == -1)
                 && (this.collision_n_2 == collision_n_2 || this.collision_n_2 == -1)
