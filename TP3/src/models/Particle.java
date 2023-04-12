@@ -175,7 +175,7 @@ public class Particle {
         double dx = other.x - this.x;
         double dy = other.y-this.y;
         double dvdr = (dvx*dx) + (dvy*dy);
-        double sigma = Math.pow(this.radius + other.radius,2);
+        double sigma = this.radius + other.radius;
         double J = (2*this.mass*other.mass*(dvdr))/(sigma* (this.mass + other.mass));
         double Jx = (J*dx)/sigma;
         double Jy = (J*dy)/sigma;
