@@ -1,6 +1,6 @@
 package models;
 
-public class Collision {
+public class Collision implements Comparable<Collision> {
 
     /* Nota: Siguiendo la sugerencia de la bibliografía, se decidió implementar la clase "collision"
     con la siguiente lógica:
@@ -25,6 +25,18 @@ public class Collision {
         this.t = t;
     }
 
+    public int getIdx1() {
+        return idx1;
+    }
+
+    public int getIdx2() {
+        return idx2;
+    }
+
+    public double getT() {
+        return t;
+    }
+
     public boolean isValidCollision(int collision_n_1, int collision_n_2){
         return (this.collision_n_1 == collision_n_1 || this.collision_n_1 == -1)
                 && (this.collision_n_2 == collision_n_2 || this.collision_n_2 == -1)
@@ -35,5 +47,17 @@ public class Collision {
         // otra colisión de las partículas involucradas (misma lógica para partícula 2).
         // La última condición estaría atajando un absurdo donde ambas sean paredes.
     }
+
+
+    @Override
+    public int compareTo(Collision o) { //para la PriorityQueue
+        int toRet = 0;
+        if(this.t > o.t)
+            toRet = 1;
+        else if(o.t > this.t)
+            toRet = -1;
+        return toRet;
+    }
+
 
 }

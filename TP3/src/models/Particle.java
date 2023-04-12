@@ -69,7 +69,15 @@ public class Particle {
         return angle;
     }
 
-/*
+    public int getCollision_n() {
+        return collision_n;
+    }
+
+    public void incCollision_n() {
+        this.collision_n++;
+    }
+
+    /*
     public boolean isNeighbour(Particle p, double r_c){
         return Math.sqrt(Math.pow(this.getX() - p.getX(), 2) +
                 Math.pow(this.getY() - p.getY(), 2))
