@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.function.Predicate;
 
 public class PoolTable {
 
@@ -127,14 +128,24 @@ public class PoolTable {
         return collisions;
     }
 
-    private void updateCollision_ns(Collision collision) {
+    private void updateCollision_ns(Collision collision, PriorityQueue<Collision> collisions) {
         if(collision.getIdx1() == -1)
             particles.get(collision.getIdx2()).bounceWithHorizontalWall();
         else if(collision.getIdx2() == -1)
             particles.get(collision.getIdx1()).bounceWithVerticalWall();
-        else
-            particles.get(collision.getIdx1()).bounceWithParticle(particles.get(collision.getIdx2()));
+        else {
+            if(collision.getIdx1() <= 5){
+                // En este caso, hay que borrar la partícula 2 de la lsita de partículas,
+                // y dejar a la otra quieta. No hay que hacer una colisión estandar.
+                // Además, sacar las colisiones que correspondan a la partícula eliminada
+                particles.remove(collision.getIdx2());
+                int toRemove = collision.getIdx2();
+                Predicate<Collision> pr = a->(a.getIdx1() == toRemove || a.getIdx2() == toRemove);
+                collisions.removeIf(pr);
 
+            }
+            particles.get(collision.getIdx1()).bounceWithParticle(particles.get(collision.getIdx2()));
+        }
     }
 
     private boolean isValid(Collision collision) {
@@ -195,7 +206,7 @@ public class PoolTable {
 
                 } while(!table.isValid(next)); //busco la primera colisión válida
                 table.updateAllParticles(next.getT()); //muevo todas las partículas al tiempo t
-                table.updateCollision_ns(next);
+                table.updateCollision_ns(next, collisions);
                 table.updateCollisionTimes(collisions, next.getT());
                 //hago el choque
                 i++;
