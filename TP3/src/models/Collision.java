@@ -51,6 +51,9 @@ public class Collision implements Comparable<Collision> {
         // otra colisión de las partículas involucradas (misma lógica para partícula 2).
         // La última condición estaría atajando un absurdo donde ambas sean paredes.
     }
+    public boolean isPocket(){
+        return this.idx1 <= 5 || this.idx2 <= 5;
+    }
 
 
     @Override

@@ -93,10 +93,54 @@ public class PoolTable {
     }
 
 
+    public PriorityQueue<Collision> setInitialCollisions(PriorityQueue<Collision> collisions){
+        for(int i=6; i<particles.size(); i++) {
+            Particle p = particles.get(i);
+            collisions.add(new Collision(-1, -1, p.getIdx(), p.getCollision_n(), p.timeToXWallBounce(2.24)));
+            collisions.add(new Collision(p.getIdx(), p.getCollision_n(), -1, -1, p.timeToYWallBounce(1.12)));
+
+            for(int j=i+1; j<particles.size(); j++) {
+                Particle p2 = particles.get(j);
+                collisions.add(new Collision(p.getIdx(), p.getCollision_n(), p2.getIdx(), p2.getCollision_n(), p.timeToParticleCollision(p2)));
+            }
+
+        }
+        return collisions;
+    }
+
+    public PriorityQueue<Collision> updateAfterCollision(PriorityQueue<Collision> collisions,
+                                                         Particle p1, Particle p2){
+        collisions.add(new Collision(-1, -1, p1.getIdx(), p1.getCollision_n(), p1.timeToXWallBounce(LONG_SIDE)));
+        collisions.add(new Collision(p1.getIdx(), p1.getCollision_n(), -1, -1, p1.timeToYWallBounce(SHORT_SIDE)));
+        collisions.add(new Collision(-1, -1, p2.getIdx(), p2.getCollision_n(), p2.timeToXWallBounce(LONG_SIDE)));
+        collisions.add(new Collision(p2.getIdx(), p2.getCollision_n(), -1, -1, p2.timeToYWallBounce(SHORT_SIDE)));
+        for(Particle p : particles) {
+            int i = p.getIdx();
+            if(i <= 5) continue;
+            if(i != p1.getIdx() && i != p2.getIdx()) {
+                Particle p3 = particles.get(i);
+                collisions.add(new Collision(p1.getIdx(), p1.getCollision_n(), p3.getIdx(), p3.getCollision_n(), p1.timeToParticleCollision(p3)));
+                collisions.add(new Collision(p2.getIdx(), p2.getCollision_n(), p3.getIdx(), p3.getCollision_n(), p2.timeToParticleCollision(p3)));
+            }
+        }
+        return collisions;
+    }
+
+    public PriorityQueue<Collision> updateAfterCollision(PriorityQueue<Collision> collisions, Particle p){
+        collisions.add(new Collision(-1, -1, p.getIdx(), p.getCollision_n(), p.timeToXWallBounce(LONG_SIDE)));
+        collisions.add(new Collision(p.getIdx(), p.getCollision_n(), -1, -1, p.timeToYWallBounce(SHORT_SIDE)));
+        for(Particle k : particles) {
+            int i = k.getIdx();
+            if(i <= 5) continue;
+            if(i != p.getIdx()) {
+                collisions.add(new Collision(p.getIdx(), p.getCollision_n(), k.getIdx(), k.getCollision_n(), p.timeToParticleCollision(k)));
+            }
+        }
+        return collisions;
+    }
 
 
-
-    public PriorityQueue<Collision> evaluateCollisions(PriorityQueue<Collision> collisions, Collision collision) {
+    /*public PriorityQueue<Collision> evaluateCollisions(PriorityQueue<Collision> collisions, Collision collision) {
         if((collision.getIdx1() == -1) && (collision.getIdx2() == -1)) {
             for(int i=6; i<particles.size(); i++) {
                 Particle p = particles.get(i);
@@ -112,10 +156,10 @@ public class PoolTable {
         } else {
             Particle p1 = particles.get(collision.getIdx1());
             Particle p2 = particles.get(collision.getIdx2());
-            collisions.add(new Collision(-1, -1, p1.getIdx(), p1.getCollision_n(), p1.timeToXWallBounce(2.24)));
-            collisions.add(new Collision(p1.getIdx(), p1.getCollision_n(), -1, -1, p1.timeToYWallBounce(1.12)));
-            collisions.add(new Collision(-1, -1, p2.getIdx(), p2.getCollision_n(), p2.timeToXWallBounce(2.24)));
-            collisions.add(new Collision(p2.getIdx(), p2.getCollision_n(), -1, -1, p2.timeToYWallBounce(1.12)));
+            collisions.add(new Collision(-1, -1, p1.getIdx(), p1.getCollision_n(), p1.timeToXWallBounce(LONG_SIDE)));
+            collisions.add(new Collision(p1.getIdx(), p1.getCollision_n(), -1, -1, p1.timeToYWallBounce(SHORT_SIDE)));
+            collisions.add(new Collision(-1, -1, p2.getIdx(), p2.getCollision_n(), p2.timeToXWallBounce(LONG_SIDE)));
+            collisions.add(new Collision(p2.getIdx(), p2.getCollision_n(), -1, -1, p2.timeToYWallBounce(SHORT_SIDE)));
             for(int i=6; i<particles.size(); i++) {
                 if(i != p1.getIdx() && i != p2.getIdx()) {
                     Particle p3 = particles.get(i);
@@ -126,7 +170,7 @@ public class PoolTable {
         }
 
         return collisions;
-    }
+    }*/
 
     private void updateCollision_ns(Collision collision, PriorityQueue<Collision> collisions) {
         if(collision.getIdx1() == -1)
@@ -134,18 +178,17 @@ public class PoolTable {
         else if(collision.getIdx2() == -1)
             particles.get(collision.getIdx1()).bounceWithVerticalWall();
         else {
-            if(collision.getIdx1() <= 5){
-                // En este caso, hay que borrar la partícula 2 de la lsita de partículas,
-                // y dejar a la otra quieta. No hay que hacer una colisión estandar.
-                // Además, sacar las colisiones que correspondan a la partícula eliminada
-                particles.remove(collision.getIdx2());
-                int toRemove = collision.getIdx2();
-                Predicate<Collision> pr = a->(a.getIdx1() == toRemove || a.getIdx2() == toRemove);
-                collisions.removeIf(pr);
-
-            }
             particles.get(collision.getIdx1()).bounceWithParticle(particles.get(collision.getIdx2()));
         }
+    }
+
+    private PriorityQueue<Collision> updateCollisionPocket(Collision collision,
+                                                           PriorityQueue<Collision> collisions){
+        int toRemove = collision.getIdx1() <= 5? collision.getIdx2():collision.getIdx1(); // Si llegue hasta acá, uno de los dos es pocket
+        particles.remove(toRemove);
+        Predicate<Collision> pr = a->(a.getIdx1() == toRemove || a.getIdx2() == toRemove);
+        collisions.removeIf(pr); // TODO: Chequear si funciona con predicate, es un testeo.
+        return collisions;
     }
 
     private boolean isValid(Collision collision) {
@@ -183,21 +226,29 @@ public class PoolTable {
         // args[0] = initial y position for white ball
         PoolTable table = new PoolTable(Double.parseDouble(args[0]));
         table.generateParticles();
-        PriorityQueue<Collision> collisions = new PriorityQueue<>();
+        PriorityQueue<Collision> collisions = new PriorityQueue<>(new Comparator<Collision>() {
+            @Override
+            public int compare(Collision o1, Collision o2) {
+                return Double.compare(o1.getT(), o2.getT());
+            }
+        });
         try(FileWriter output = new FileWriter(new File("C:\\Users\\Franco De Simone\\Documents\\2C\\SS\\SimSistemas\\TP3\\src\\utils", "output2.txt"));) {
             int i=0;
-            Collision next = new Collision(-1, -1, -1, -1, -1);
-            while(i<10) { //TODO: condición de corte
-                setHeaders(output, 16, i);
-                for(int idx = 6; idx<22; idx++){
-                    Particle p = particles.get(idx);
-                    output.write(String.format("%d %f %f %f %f %f %f %f\n", p.getIdx(),
-                            p.getX(), p.getY(), 0*1.0,
-                            p.getVx(), p.getVy(),
-                            p.getAngle(), p.getMass()));
-                }
+            int totalTime = 0;
+            Collision next;
 
-                collisions = table.evaluateCollisions(collisions, next); //ordeno todas las colisiones en la cola
+            collisions = table.setInitialCollisions(collisions);
+
+            while(particles.size() > 6) { //TODO: condición de corte
+                setHeaders(output, 16, i);
+                for(Particle p : particles){
+                    if(p.getIdx() > 5){
+                        output.write(String.format("%d %f %f %f %f %f %f %f\n", p.getIdx(),
+                                p.getX(), p.getY(), 0*1.0,
+                                p.getVx(), p.getVy(),
+                                p.getAngle(), p.getMass()));
+                    }
+                }
 
                 do {
                     next = collisions.poll();
@@ -206,20 +257,32 @@ public class PoolTable {
 
                 } while(!table.isValid(next)); //busco la primera colisión válida
                 table.updateAllParticles(next.getT()); //muevo todas las partículas al tiempo t
-                table.updateCollision_ns(next, collisions);
-                table.updateCollisionTimes(collisions, next.getT());
-                //hago el choque
+                if(next.isPocket()){
+                    table.updateCollisionPocket(next, collisions);
+                    table.updateCollisionTimes(collisions, next.getT());
+                }
+                else {
+                    table.updateCollision_ns(next, collisions);
+                    table.updateCollisionTimes(collisions, next.getT());
+
+                    // TODO: Acá falta hacer un update si choca con una pared, en lo cual solo habría que recalcular
+                    //      las colisiones de cada partícula con las otras, y no de ambas
+                    // Solución -> SI el índice es -1, fue una colisión con pared. Con el método que calcula las
+                    //  colisiones de una sola partícula, se puede evaluar si hay que recalcular sus colisiones o no,
+                    // sin necesidad de evaluar ambas partículas a la vez.
+                    if(next.getIdx1() != -1){
+                        table.updateAfterCollision(collisions, particles.get(next.getIdx1()));
+                    }
+                    if(next.getIdx2() != -1){
+                        table.updateAfterCollision(collisions, particles.get(next.getIdx2()));
+                    }
+                }//hago el choque
+                totalTime += next.getT();
                 i++;
             }
-
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-
-
     }
 
     private static void setHeaders(FileWriter output, int N, int i){
