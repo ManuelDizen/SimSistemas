@@ -52,7 +52,7 @@ public class Collision implements Comparable<Collision> {
         // La última condición estaría atajando un absurdo donde ambas sean paredes.
     }
     public boolean isPocket(){
-        return this.idx1 <= 5 || this.idx2 <= 5;
+        return (this.idx1 >= 0 && this.idx1 <= 5) || (this.idx2 >= 0 && this.idx2 <= 5);
     }
 
 
