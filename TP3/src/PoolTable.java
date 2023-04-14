@@ -50,7 +50,7 @@ public class PoolTable {
         double initial_triangle_y = SHORT_SIDE/2;
 
         //primera bola
-        particles.add(new Particle(LONG_SIDE-0.56, SHORT_SIDE/2, 0, 0, 7, BALL_RADIUS, MASS));
+        particles.add(new Particle(initial_triangle_x, initial_triangle_y, 0, 0, 7, BALL_RADIUS, MASS));
 
         //2da fila
         particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + MAX_EPSILON/2,
@@ -71,10 +71,12 @@ public class PoolTable {
                 initial_triangle_y - (3*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 13, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
                 initial_triangle_y + (3*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 14, BALL_RADIUS, MASS));
+
         particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
                 initial_triangle_y - BALL_RADIUS + MAX_EPSILON/2, 0, 0, 15, BALL_RADIUS, MASS));
+
         particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - BALL_RADIUS + MAX_EPSILON/2, 0, 0, 16, BALL_RADIUS, MASS));
+                initial_triangle_y + BALL_RADIUS + MAX_EPSILON/2, 0, 0, 16, BALL_RADIUS, MASS));
 
         // 5ta fila
         particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
@@ -247,12 +249,10 @@ public class PoolTable {
             while(particles.size() > 6) { //TODO: condición de corte
                 setHeaders(output, particles.size(), i);
                 for(Particle p : particles){
-                    if(p.getIdx() > 5){
                         output.write(String.format("%d %f %f %f %f %f %f %f\n", p.getIdx(),
                                 p.getX(), p.getY(), 0*1.0,
                                 p.getVx(), p.getVy(),
                                 p.getAngle(), p.getMass()));
-                    }
                 }
 
                 System.out.println(String.format("\nITERATION %d: (size %d)\n", i, particles.size()));
