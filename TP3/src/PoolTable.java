@@ -105,69 +105,49 @@ public class PoolTable {
         return collisions;
     }
 
-    public PriorityQueue<Collision> updateAfterCollision(PriorityQueue<Collision> collisions,
-                                                         Particle p1, Particle p2){
-        collisions.add(new Collision(-1, -1, p1.getIdx(), p1.getCollision_n(), p1.timeToXWallBounce(LONG_SIDE)));
-        collisions.add(new Collision(p1.getIdx(), p1.getCollision_n(), -1, -1, p1.timeToYWallBounce(SHORT_SIDE)));
-        collisions.add(new Collision(-1, -1, p2.getIdx(), p2.getCollision_n(), p2.timeToXWallBounce(LONG_SIDE)));
-        collisions.add(new Collision(p2.getIdx(), p2.getCollision_n(), -1, -1, p2.timeToYWallBounce(SHORT_SIDE)));
-        for(Particle p : particles) {
-            int i = p.getIdx();
-            if(i <= 5) continue;
-            if(i != p1.getIdx() && i != p2.getIdx()) {
-                Particle p3 = particles.get(i);
-                collisions.add(new Collision(p1.getIdx(), p1.getCollision_n(), p3.getIdx(), p3.getCollision_n(), p1.timeToParticleCollision(p3)));
-                collisions.add(new Collision(p2.getIdx(), p2.getCollision_n(), p3.getIdx(), p3.getCollision_n(), p2.timeToParticleCollision(p3)));
-            }
+    private void calculateInitialCollisions(PriorityQueue<Collision> collisions){
+        int white_idx = 6;
+        Particle white = getByIdx(white_idx);
+        collisions.add(new Collision(-1, -1, white.getIdx(), white.getCollision_n(), white.timeToXWallBounce(2.24)));
+        for(int j=white_idx+1; j<particles.size(); j++) {
+            Particle p2 = particles.get(j);
+            double tc = white.timeToParticleCollision(p2);
+            if(tc > 0)
+                collisions.add(new Collision(white.getIdx(), white.getCollision_n(), p2.getIdx(), p2.getCollision_n(), tc));
         }
-        return collisions;
+    }
+
+
+    private void removePreviousCollisions(PriorityQueue<Collision> collisions, Particle p){
+        int toRemove = p.getIdx();
+        Predicate<Collision> pr = a->(a.getIdx1() == toRemove || a.getIdx2() == toRemove);
+        collisions.removeIf(pr); // TODO: Chequear si funciona con predicate, es un testeo.
     }
 
     public PriorityQueue<Collision> updateAfterCollision(PriorityQueue<Collision> collisions, Particle p){
-        collisions.add(new Collision(-1, -1, p.getIdx(), p.getCollision_n(), p.timeToXWallBounce(LONG_SIDE)));
-        collisions.add(new Collision(p.getIdx(), p.getCollision_n(), -1, -1, p.timeToYWallBounce(SHORT_SIDE)));
+
+        removePreviousCollisions(collisions, p);
+
+        double time_to_x = p.timeToXWallBounce(LONG_SIDE);
+        if(time_to_x > 0)
+            collisions.add(new Collision(-1, -1, p.getIdx(), p.getCollision_n(),
+                    time_to_x));
+        double time_to_y = p.timeToYWallBounce(SHORT_SIDE);
+        if(time_to_y > 0)
+            collisions.add(new Collision(p.getIdx(), p.getCollision_n(), -1, -1,
+                    time_to_y));
         for(Particle k : particles) {
             int i = k.getIdx();
             if(i <= 5) continue;
             if(i != p.getIdx()) {
-                collisions.add(new Collision(p.getIdx(), p.getCollision_n(), k.getIdx(), k.getCollision_n(), p.timeToParticleCollision(k)));
+                double tc = p.timeToParticleCollision(k);
+                if(tc > 0 )
+                    collisions.add(new Collision(p.getIdx(), p.getCollision_n(), k.getIdx(), k.getCollision_n(),
+                            tc));
             }
         }
         return collisions;
     }
-
-
-    /*public PriorityQueue<Collision> evaluateCollisions(PriorityQueue<Collision> collisions, Collision collision) {
-        if((collision.getIdx1() == -1) && (collision.getIdx2() == -1)) {
-            for(int i=6; i<particles.size(); i++) {
-                Particle p = particles.get(i);
-                collisions.add(new Collision(-1, -1, p.getIdx(), p.getCollision_n(), p.timeToXWallBounce(2.24)));
-                collisions.add(new Collision(p.getIdx(), p.getCollision_n(), -1, -1, p.timeToYWallBounce(1.12)));
-
-                for(int j=i+1; j<particles.size(); j++) {
-                    Particle p2 = particles.get(j);
-                    collisions.add(new Collision(p.getIdx(), p.getCollision_n(), p2.getIdx(), p2.getCollision_n(), p.timeToParticleCollision(p2)));
-                }
-
-            }
-        } else {
-            Particle p1 = particles.get(collision.getIdx1());
-            Particle p2 = particles.get(collision.getIdx2());
-            collisions.add(new Collision(-1, -1, p1.getIdx(), p1.getCollision_n(), p1.timeToXWallBounce(LONG_SIDE)));
-            collisions.add(new Collision(p1.getIdx(), p1.getCollision_n(), -1, -1, p1.timeToYWallBounce(SHORT_SIDE)));
-            collisions.add(new Collision(-1, -1, p2.getIdx(), p2.getCollision_n(), p2.timeToXWallBounce(LONG_SIDE)));
-            collisions.add(new Collision(p2.getIdx(), p2.getCollision_n(), -1, -1, p2.timeToYWallBounce(SHORT_SIDE)));
-            for(int i=6; i<particles.size(); i++) {
-                if(i != p1.getIdx() && i != p2.getIdx()) {
-                    Particle p3 = particles.get(i);
-                    collisions.add(new Collision(p1.getIdx(), p1.getCollision_n(), p3.getIdx(), p3.getCollision_n(), p1.timeToParticleCollision(p3)));
-                    collisions.add(new Collision(p2.getIdx(), p2.getCollision_n(), p3.getIdx(), p3.getCollision_n(), p2.timeToParticleCollision(p3)));
-                }
-            }
-        }
-
-        return collisions;
-    }*/
 
     private Particle getByIdx(int idx){
         return particles.stream().filter(p -> (p.getIdx() == idx)).findFirst().orElse(null);
@@ -176,16 +156,20 @@ public class PoolTable {
 
     private void updateCollision_ns(Collision collision, PriorityQueue<Collision> collisions) {
         Particle aux = null;
-        if(collision.getIdx1() == -1)
+        if(collision.getIdx1() == -1) {
             //TODO: No se puede usar el índice en la lista porque cuando los vamos sacando se va moviendo,
             // la posición en el arreglo no es siempre el índice de la partícula
             //particles.get(collision.getIdx2()).bounceWithHorizontalWall();
             aux = getByIdx(collision.getIdx2());
-            if(aux != null) aux.bounceWithHorizontalWall();
-        else if(collision.getIdx2() == -1)
+            if (aux != null)
+                aux.bounceWithHorizontalWall();
+        }
+        else if(collision.getIdx2() == -1) {
             //particles.get(collision.getIdx1()).bounceWithVerticalWall();
             aux = getByIdx(collision.getIdx1());
-            if(aux != null) aux.bounceWithVerticalWall();
+            if (aux != null)
+                aux.bounceWithVerticalWall();
+        }
         else {
             //particles.get(collision.getIdx1()).bounceWithParticle(particles.get(collision.getIdx2()));
             Particle aux1 = getByIdx(collision.getIdx1());
@@ -207,21 +191,13 @@ public class PoolTable {
         if(collision.getT() >= 0) {
             System.out.println("isValid: " + collision.getIdx1() + ", " + collision.getIdx2());
             int col_n1 = -1, col_n2 = -1;
-            Particle p = null;
-            if(collision.getIdx1() == -1) { //pared horizontal
-                col_n1 = -1;
-            }
-            else {
+            Particle p;
+            if(collision.getIdx1() != -1) { //pared horizontal
                 p = getByIdx(collision.getIdx1());
                 if (p != null)
                     col_n1 = p.getCollision_n();
-                //col_n1 = particles.get(collision.getIdx1()).getCollision_n();
             }
-            if(collision.getIdx2() == -1) { //pared vertical
-                col_n2 = -1;
-            }
-            else {
-                //col_n2 = particles.get(collision.getIdx2()).getCollision_n();
+            if(collision.getIdx2() != -1) { //pared vertical
                 p = getByIdx(collision.getIdx2());
                 if(p != null){
                     col_n2 = p.getCollision_n();
@@ -245,7 +221,6 @@ public class PoolTable {
         }
     }
 
-
     public static void main(String[] args) {
         // args[0] = initial y position for white ball
         PoolTable table = new PoolTable(Double.parseDouble(args[0]));
@@ -262,9 +237,11 @@ public class PoolTable {
             int i=0;
             Collision next;
 
-            collisions = table.setInitialCollisions(collisions);
-            Particle aux = null;
+            table.calculateInitialCollisions(collisions);
+            //collisions = table.setInitialCollisions(collisions);
+                // TODO: TIene sentido un setInitialCollisions? No alcanza con calcular las de la blanca?
             while(particles.size() > 6) { //TODO: condición de corte
+
                 setHeaders(output, particles.size(), i);
                 for(Particle p : particles){
                     if(p.getIdx() > 5){
@@ -274,8 +251,9 @@ public class PoolTable {
                                 p.getAngle(), p.getMass()));
                     }
                 }
-                aux = null;
+
                 System.out.println(String.format("\nITERATION %d:\n", i));
+
                 do {
                     next = collisions.poll();
                     if(next.getT() >= 0)
@@ -290,12 +268,6 @@ public class PoolTable {
                 else {
                     table.updateCollision_ns(next, collisions);
                     table.updateCollisionTimes(collisions, next.getT());
-
-                    // TODO: Acá falta hacer un update si choca con una pared, en lo cual solo habría que recalcular
-                    //      las colisiones de cada partícula con las otras, y no de ambas
-                    // Solución -> SI el índice es -1, fue una colisión con pared. Con el método que calcula las
-                    //  colisiones de una sola partícula, se puede evaluar si hay que recalcular sus colisiones o no,
-                    // sin necesidad de evaluar ambas partículas a la vez.
                     if(next.getIdx1() != -1){
                         Particle p = table.getByIdx(next.getIdx1());
                         if(p!= null)
