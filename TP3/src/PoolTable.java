@@ -1,5 +1,6 @@
 import models.Collision;
 import models.Particle;
+import utils.OutputParser;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -234,12 +235,13 @@ public class PoolTable {
 
     public static void main(String[] args) {
         // args[0] = initial y position for white ball
-        PoolTable table = new PoolTable(Double.parseDouble(args[0]));
+        double initial_y = Double.parseDouble(args[0]);
+        PoolTable table = new PoolTable(initial_y);
         table.generateParticles();
         PriorityQueue<Collision> collisions = new PriorityQueue<>();
         double totalTime = 0;
         try(FileWriter output = new FileWriter(
-                "output2.txt")) {
+                String.format("output_y=%f.txt", initial_y))) {
             int i=0;
             Collision next;
 
@@ -247,14 +249,14 @@ public class PoolTable {
             //collisions = table.setInitialCollisions(collisions);
                 // TODO: TIene sentido un setInitialCollisions? No alcanza con calcular las de la blanca?
             while(particles.size() > 6) { //TODO: condición de corte
-                setHeaders(output, particles.size(), i);
+                /*setHeaders(output, particles.size(), i);
                 for(Particle p : particles){
                         output.write(String.format("%d %f %f %f %f %f %f %f\n", p.getIdx(),
                                 p.getX(), p.getY(), 0*1.0,
                                 p.getVx(), p.getVy(),
                                 p.getAngle(), p.getMass()));
-                }
-
+                }*/
+                OutputParser.takeSnapshot(output, particles, i);
                 System.out.println(String.format("\nITERATION %d: (size %d)\n", i, particles.size()));
 
                 do {
@@ -262,7 +264,21 @@ public class PoolTable {
                     if(next.getT() >= 0)
                         System.out.println("next: " + next.getIdx1() + ", " + next.getIdx2() + ": " + next.getT());
                 } while(!table.isValid(next)); //busco la primera colisión válida
-                table.updateAllParticles(next.getT()); //muevo todas las partículas al tiempo t
+                /*table.updateAllParticles(next.getT()/2); //muevo todas las partículas al tiempo t
+
+                OutputParser.takeSnapshot(output, particles, i);
+
+                table.updateAllParticles(next.getT()/2); //muevo todas las partículas al tiempo t
+                */
+                double auxTime = 0.1;
+                double T = next.getT();
+                while(auxTime < T){
+                    table.updateAllParticles(0.1);
+                    OutputParser.takeSnapshot(output, particles, i);
+                    auxTime += 0.1;
+                }
+                auxTime -= 0.1;
+                table.updateAllParticles(T - auxTime);
 
                 if(next.isPocket()){
                     table.updateCollisionPocket(next, collisions);
@@ -290,9 +306,11 @@ public class PoolTable {
                 totalTime += next.getT();
                 i++;
             }
+            OutputParser.takeSnapshot(output, particles, i);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         System.out.printf("\nTiempo total hasta que todas las bolas ingresaron a los huecos: %f\n", totalTime);
     }
 

@@ -77,7 +77,16 @@ public class Particle {
         this.collision_n++;
     }
 
-    /*
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+
+/*
     public boolean isNeighbour(Particle p, double r_c){
         return Math.sqrt(Math.pow(this.getX() - p.getX(), 2) +
                 Math.pow(this.getY() - p.getY(), 2))
