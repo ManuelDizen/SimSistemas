@@ -264,21 +264,7 @@ public class PoolTable {
                     if(next.getT() >= 0)
                         System.out.println("next: " + next.getIdx1() + ", " + next.getIdx2() + ": " + next.getT());
                 } while(!table.isValid(next)); //busco la primera colisión válida
-                /*table.updateAllParticles(next.getT()/2); //muevo todas las partículas al tiempo t
-
-                OutputParser.takeSnapshot(output, particles, i);
-
-                table.updateAllParticles(next.getT()/2); //muevo todas las partículas al tiempo t
-                */
-                double auxTime = 0.1;
-                double T = next.getT();
-                while(auxTime < T){
-                    table.updateAllParticles(0.1);
-                    OutputParser.takeSnapshot(output, particles, i);
-                    auxTime += 0.1;
-                }
-                auxTime -= 0.1;
-                table.updateAllParticles(T - auxTime);
+                table.updateAllParticles(next.getT());
 
                 if(next.isPocket()){
                     table.updateCollisionPocket(next, collisions);
