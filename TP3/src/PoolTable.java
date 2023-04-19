@@ -2,7 +2,6 @@ import models.Collision;
 import models.Particle;
 import utils.OutputParser;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -57,57 +56,40 @@ public class PoolTable {
         particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + MAX_EPSILON/2,
                 initial_triangle_y + BALL_RADIUS + MAX_EPSILON/2, 0, 0, 8, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + MAX_EPSILON/2,
-                initial_triangle_y - BALL_RADIUS + MAX_EPSILON/2, 0, 0, 9, BALL_RADIUS, MASS));
+                initial_triangle_y - BALL_RADIUS - MAX_EPSILON/2, 0, 0, 9, BALL_RADIUS, MASS));
 
         // 3ra fila
         particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + MAX_EPSILON/2,
-                                    initial_triangle_y + MAX_EPSILON/2, 0, 0, 10, BALL_RADIUS, MASS));
+                                    initial_triangle_y + ((MAX_EPSILON/2)*(Math.random()<0.5?1:-1)), 0, 0, 10, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + MAX_EPSILON/2,
                 initial_triangle_y + MAX_EPSILON/2 + (2*BALL_RADIUS), 0, 0, 11, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - (2*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 12, BALL_RADIUS, MASS));
+                initial_triangle_y - (2*BALL_RADIUS) - MAX_EPSILON/2, 0, 0, 12, BALL_RADIUS, MASS));
         
         //4ta fila
         particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - (3*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 13, BALL_RADIUS, MASS));
+                initial_triangle_y - (3*BALL_RADIUS) - MAX_EPSILON/2, 0, 0, 13, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
                 initial_triangle_y + (3*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 14, BALL_RADIUS, MASS));
-
         particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - BALL_RADIUS + MAX_EPSILON/2, 0, 0, 15, BALL_RADIUS, MASS));
+                initial_triangle_y - BALL_RADIUS - MAX_EPSILON/2, 0, 0, 15, BALL_RADIUS, MASS));
 
         particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
                 initial_triangle_y + BALL_RADIUS + MAX_EPSILON/2, 0, 0, 16, BALL_RADIUS, MASS));
 
         // 5ta fila
         particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y + MAX_EPSILON/2, 0, 0, 17, BALL_RADIUS, MASS));
+                initial_triangle_y + ((MAX_EPSILON/2)*(Math.random()<0.5?1:-1)), 0, 0, 17, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
                 initial_triangle_y + MAX_EPSILON/2 + (2*BALL_RADIUS), 0, 0, 18, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - (2*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 19, BALL_RADIUS, MASS));
+                initial_triangle_y - (2*BALL_RADIUS) - MAX_EPSILON/2, 0, 0, 19, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
                 initial_triangle_y + (2*2*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 20, BALL_RADIUS, MASS));
         particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - (2*2*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 21, BALL_RADIUS, MASS));
+                initial_triangle_y - (2*2*BALL_RADIUS) - MAX_EPSILON/2, 0, 0, 21, BALL_RADIUS, MASS));
 
 
-    }
-
-
-    public PriorityQueue<Collision> setInitialCollisions(PriorityQueue<Collision> collisions){
-        for(int i=6; i<particles.size(); i++) {
-            Particle p = particles.get(i);
-            collisions.add(new Collision(-1, -1, p.getIdx(), p.getCollision_n(), p.timeToXWallBounce(2.24)));
-            collisions.add(new Collision(p.getIdx(), p.getCollision_n(), -1, -1, p.timeToYWallBounce(1.12)));
-
-            for(int j=i+1; j<particles.size(); j++) {
-                Particle p2 = particles.get(j);
-                collisions.add(new Collision(p.getIdx(), p.getCollision_n(), p2.getIdx(), p2.getCollision_n(), p.timeToParticleCollision(p2)));
-            }
-
-        }
-        return collisions;
     }
 
     private void calculateInitialCollisions(PriorityQueue<Collision> collisions){
@@ -130,7 +112,7 @@ public class PoolTable {
 
     }
 
-    public PriorityQueue<Collision> updateAfterCollision(PriorityQueue<Collision> collisions, Particle p){
+    public void updateAfterCollision(PriorityQueue<Collision> collisions, Particle p){
 
         removePreviousCollisions(collisions, p);
 
@@ -151,7 +133,6 @@ public class PoolTable {
                             tc));
             }
         }
-        return collisions;
     }
 
     private Particle getByIdx(int idx){
@@ -159,45 +140,33 @@ public class PoolTable {
     }
 
     private void updateCollision_ns(Collision collision, PriorityQueue<Collision> collisions) {
-
-        //System.out.println("Entro a updateCollision_ns");
-        //System.out.println("collision: " + collision.getIdx1() + ": " + getByIdx(collision.getIdx1()).getCollision_n() + " - " + collision.getIdx2() + ": " + getByIdx(collision.getIdx2()).getCollision_n() );
-
         Particle aux = null;
         if(collision.getIdx1() == -1) {
-            //particles.get(collision.getIdx2()).bounceWithHorizontalWall();
             aux = getByIdx(collision.getIdx2());
             if (aux != null)
                 aux.bounceWithHorizontalWall();
         }
         else if(collision.getIdx2() == -1) {
-            //particles.get(collision.getIdx1()).bounceWithVerticalWall();
             aux = getByIdx(collision.getIdx1());
             if (aux != null)
                 aux.bounceWithVerticalWall();
         }
         else {
-            //particles.get(collision.getIdx1()).bounceWithParticle(particles.get(collision.getIdx2()));
             Particle aux1 = getByIdx(collision.getIdx1());
             Particle aux2 = getByIdx(collision.getIdx2());
             aux1.bounceWithParticle(aux2);
             aux2.incCollision_n();
         }
-
-        //System.out.println("collision: " + collision.getIdx1() + ": " + getByIdx(collision.getIdx1()).getCollision_n() + " - " + collision.getIdx2() + ": " + getByIdx(collision.getIdx2()).getCollision_n() );
     }
 
-    private PriorityQueue<Collision> updateCollisionPocket(Collision collision,
-                                                           PriorityQueue<Collision> collisions){
-        System.out.println("POCKET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
+    private void updateCollisionPocket(Collision collision,
+                                       PriorityQueue<Collision> collisions){
         int toRemove = collision.getIdx1() <= 5? collision.getIdx2():collision.getIdx1(); // Si llegue hasta acá, uno de los dos es pocket
         System.out.println(toRemove);
         particles.removeIf(p -> p.getIdx() == toRemove);
         Predicate<Collision> pr = a->(a.getIdx1() == toRemove || a.getIdx2() == toRemove);
         collisions.removeIf(pr);
 
-        return collisions;
     }
 
     private boolean isValid(Collision collision) {
@@ -246,21 +215,16 @@ public class PoolTable {
             Collision next;
 
             table.calculateInitialCollisions(collisions);
-            //collisions = table.setInitialCollisions(collisions);
-                // TODO: TIene sentido un setInitialCollisions? No alcanza con calcular las de la blanca?
             while(particles.size() > 6) { //TODO: condición de corte
-                /*setHeaders(output, particles.size(), i);
-                for(Particle p : particles){
-                        output.write(String.format("%d %f %f %f %f %f %f %f\n", p.getIdx(),
-                                p.getX(), p.getY(), 0*1.0,
-                                p.getVx(), p.getVy(),
-                                p.getAngle(), p.getMass()));
-                }*/
                 OutputParser.takeSnapshot(output, particles, i);
-                System.out.println(String.format("\nITERATION %d: (size %d)\n", i, particles.size()));
+//                System.out.println(String.format("\nITERATION %d: (size %d)\n", i, particles.size()));
 
                 do {
                     next = collisions.poll();
+                    if(next == null){
+                        System.out.println("Error de sistema: No quedan colisiones y no se terminaron las partículas.");
+                        System.exit(1);
+                    }
                     if(next.getT() >= 0)
                         System.out.println("next: " + next.getIdx1() + ", " + next.getIdx2() + ": " + next.getT());
                 } while(!table.isValid(next)); //busco la primera colisión válida
