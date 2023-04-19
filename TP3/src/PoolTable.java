@@ -32,6 +32,9 @@ public class PoolTable {
     }
 
 
+    private double epsilon() {
+        return (MAX_EPSILON - Math.random()*0.0001)/Math.sqrt(2);
+    }
 
     private void generateParticles() {
 
@@ -51,43 +54,59 @@ public class PoolTable {
 
         //primera bola
         particles.add(new Particle(initial_triangle_x, initial_triangle_y, 0, 0, 7, BALL_RADIUS, MASS));
+        System.out.println(initial_triangle_x + ", " + initial_triangle_y);
 
         //2da fila
-        particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + MAX_EPSILON/2,
-                initial_triangle_y + BALL_RADIUS + MAX_EPSILON/2, 0, 0, 8, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + MAX_EPSILON/2,
-                initial_triangle_y - BALL_RADIUS - MAX_EPSILON/2, 0, 0, 9, BALL_RADIUS, MASS));
+        double epsilon = 0;
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + epsilon,
+                initial_triangle_y + BALL_RADIUS + epsilon, 0, 0, 8, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + BALL_RADIUS*2 + epsilon,
+                initial_triangle_y - BALL_RADIUS - epsilon, 0, 0, 9, BALL_RADIUS, MASS));
 
         // 3ra fila
-        particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + MAX_EPSILON/2,
-                                    initial_triangle_y + ((MAX_EPSILON/2)*(Math.random()<0.5?1:-1)), 0, 0, 10, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y + MAX_EPSILON/2 + (2*BALL_RADIUS), 0, 0, 11, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - (2*BALL_RADIUS) - MAX_EPSILON/2, 0, 0, 12, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + epsilon,
+                initial_triangle_y + ((epsilon)*(Math.random()<0.5?1:-1)), 0, 0, 10, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + epsilon,
+                initial_triangle_y + epsilon + (2*BALL_RADIUS), 0, 0, 11, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*2*BALL_RADIUS) + epsilon,
+                initial_triangle_y - (2*BALL_RADIUS) - epsilon, 0, 0, 12, BALL_RADIUS, MASS));
         
         //4ta fila
-        particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - (3*BALL_RADIUS) - MAX_EPSILON/2, 0, 0, 13, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y + (3*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 14, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - BALL_RADIUS - MAX_EPSILON/2, 0, 0, 15, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + epsilon,
+                initial_triangle_y - (3*BALL_RADIUS) - epsilon, 0, 0, 13, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + epsilon,
+                initial_triangle_y + (3*BALL_RADIUS) + epsilon, 0, 0, 14, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + epsilon,
+                initial_triangle_y - BALL_RADIUS - epsilon, 0, 0, 15, BALL_RADIUS, MASS));
 
-        particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y + BALL_RADIUS + MAX_EPSILON/2, 0, 0, 16, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*3*BALL_RADIUS) + epsilon,
+                initial_triangle_y + BALL_RADIUS + epsilon, 0, 0, 16, BALL_RADIUS, MASS));
 
         // 5ta fila
-        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y + ((MAX_EPSILON/2)*(Math.random()<0.5?1:-1)), 0, 0, 17, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y + MAX_EPSILON/2 + (2*BALL_RADIUS), 0, 0, 18, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - (2*BALL_RADIUS) - MAX_EPSILON/2, 0, 0, 19, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y + (2*2*BALL_RADIUS) + MAX_EPSILON/2, 0, 0, 20, BALL_RADIUS, MASS));
-        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + MAX_EPSILON/2,
-                initial_triangle_y - (2*2*BALL_RADIUS) - MAX_EPSILON/2, 0, 0, 21, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + epsilon,
+                initial_triangle_y + ((epsilon)*(Math.random()<0.5?1:-1)), 0, 0, 17, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + epsilon,
+                initial_triangle_y + epsilon + (2*BALL_RADIUS), 0, 0, 18, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + epsilon,
+                initial_triangle_y - (2*BALL_RADIUS) - epsilon, 0, 0, 19, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + epsilon,
+                initial_triangle_y + (2*2*BALL_RADIUS) + epsilon, 0, 0, 20, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + (2*4*BALL_RADIUS) + epsilon,
+                initial_triangle_y - (2*2*BALL_RADIUS) - epsilon, 0, 0, 21, BALL_RADIUS, MASS));
 
 
     }
@@ -204,9 +223,11 @@ public class PoolTable {
 
     public static void main(String[] args) {
         // args[0] = initial y position for white ball
+
         double initial_y = Double.parseDouble(args[0]);
         PoolTable table = new PoolTable(initial_y);
         table.generateParticles();
+
         PriorityQueue<Collision> collisions = new PriorityQueue<>();
         double totalTime = 0;
         try(FileWriter output = new FileWriter(
