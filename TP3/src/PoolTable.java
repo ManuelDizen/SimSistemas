@@ -7,16 +7,18 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static utils.StatisticsUtils.arraySum;
 import static utils.StatisticsUtils.calculateStandardDeviation;
 
 public class PoolTable {
 
+    private static final int MAX_COLLISIONS = 1000;
     private static List<Particle> particles;
 
     private static final double LONG_SIDE = 2.24; // m
 
     private static final double SHORT_SIDE = 1.12; // m
-    private static final double V = 2.00; // m/s
+    private final double V; // m/s
     private static final double INITIAL_X = 0.56; // m
     private static final double BALL_RADIUS = 0.0285; // m
 
@@ -26,11 +28,18 @@ public class PoolTable {
 
     private static double MASS = 0.165; // kg
 
-    private double initial_y;
+    private final double initial_y;
 
     public PoolTable(double initial_y) {
         this.initial_y = initial_y;
         this.particles = new ArrayList<>();
+        this.V = 2.0;
+    }
+
+    public PoolTable(double initial_y, double initial_velocity){
+        this.initial_y = initial_y;
+        this.particles = new ArrayList<>();
+        this.V = initial_velocity;
     }
 
 
@@ -223,89 +232,100 @@ public class PoolTable {
         // args[0] = initial y position for white ball
 
         //double initial_y = Double.parseDouble(args[0]);
-        double[] heights2 = {0.42, 0.434, 0.448, 0.462, 0.476, 0.490, 0.504, 0.518, 0.532, 0.546, 0.56};
+        //double[] heights = {0.42, 0.434, 0.448, 0.462, 0.476, 0.490, 0.504, 0.518, 0.532, 0.546, 0.56};
         double[] heights = {0.518};
-        double[] finalTimes = new double[heights.length];
+        //double[] velocities = {0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0, 8.0};
+        //double[] velocities = {2.0, 3.0, 4.0, 6.0, 8.0};
+        double[] velocities = {2.0};
+        double[] finalTimes = new double[velocities.length];
         int timesCounter = 0;
-        int iterations = 100;
-        for(double initial_y : heights){
-            List<Double> times = new ArrayList<>();
-            for (int iters = 0; iters < iterations; iters++) {
-                PoolTable table = new PoolTable(initial_y);
-                table.generateParticles();
+        int iterations = 1;
+        for(double initial_y : heights) {
+            for (double initial_velocity : velocities) {
+                List<Double> times = new ArrayList<>();
+                for (int iters = 0; iters < iterations; iters++) {
+                    //PoolTable table = new PoolTable(initial_y);
+                    PoolTable table = new PoolTable(initial_y, initial_velocity);
+                    table.generateParticles();
 
-                PriorityQueue<Collision> collisions = new PriorityQueue<>();
-                double totalTime = 0;
-                try (FileWriter output = new FileWriter(
-                        String.format("output_y=%f.txt", initial_y))) {
-                    int i = 0;
-                    Collision next;
+                    PriorityQueue<Collision> collisions = new PriorityQueue<>();
+                    double totalTime = 0;
+                    try (FileWriter output = new FileWriter(
+                            String.format("output_y=%f.txt", initial_y))) {
+                        int i = 0;
+                        Collision next;
+                        double[] collisionTimes = new double[MAX_COLLISIONS];
+                        int timesCounter2 = 0;
+                        table.calculateInitialCollisions(collisions);
+                        while (particles.size() > 6) {
+                            OutputParser.takeSnapshot(output, particles, i);
+                            do {
+                                next = collisions.poll();
+                                if (next == null) {
+                                    System.out.println("Collisions:" + collisions);
+                                    System.out.println("Particles:");
+                                    for (Particle p : particles)
+                                        System.out.println(p.getIdx() + ", " + p.getVx() + ", " + p.getVy());
+                                    System.out.println("Error de sistema: No quedan colisiones y no se terminaron las partículas.");
+                                    System.exit(1);
+                                }
+                            } while (!table.isValid(next)); //busco la primera colisión válida
+                            collisionTimes[timesCounter2++] = next.getT();
+                            table.updateAllParticles(next.getT());
 
-                    table.calculateInitialCollisions(collisions);
-                    while (particles.size() > 6) { //TODO: condición de corte
+                            if (next.isPocket()) {
+                                table.updateCollisionPocket(next, collisions);
+                                table.updateCollisionTimes(collisions, next.getT());
+                            } else {
+                                table.updateCollision_ns(next, collisions);
+                                table.updateCollisionTimes(collisions, next.getT());
+                                if (next.getIdx1() != -1) {
+                                    Particle p = table.getByIdx(next.getIdx1());
+                                    if (p != null)
+                                        table.updateAfterCollision(collisions, p);
+                                }
+                                if (next.getIdx2() != -1) {
+                                    Particle p = table.getByIdx(next.getIdx2());
+                                    if (p != null)
+                                        table.updateAfterCollision(collisions, p);
+                                }
+                            }//hago el choque
+
+                            //                System.out.println("---------------ANTES DE SALIR---------------------------");
+                            //                for(Collision col : collisions) {
+                            //                    System.out.println("collision: " + col.getIdx1() + " - " + col.getIdx2() + ": " + col.getT());
+                            //                }
+                            totalTime += next.getT();
+                            i++;
+                        }
                         OutputParser.takeSnapshot(output, particles, i);
-    //                System.out.println(String.format("\nITERATION %d: (size %d)\n", i, particles.size()));
-
-                        do {
-                            next = collisions.poll();
-                            if (next == null) {
-                                System.out.println("Collisions:" + collisions);
-                                System.out.println("Particles:");
-                                for (Particle p : particles)
-                                    System.out.println(p.getIdx() + ", " + p.getVx() + ", " + p.getVy());
-                                System.out.println("Error de sistema: No quedan colisiones y no se terminaron las partículas.");
-                                System.exit(1);
-                            }
-    //                        if (next.getT() >= 0)
-    //                            System.out.println("next: " + next.getIdx1() + ", " + next.getIdx2() + ": " + next.getT());
-                        } while (!table.isValid(next)); //busco la primera colisión válida
-                        table.updateAllParticles(next.getT());
-
-                        if (next.isPocket()) {
-                            table.updateCollisionPocket(next, collisions);
-                            table.updateCollisionTimes(collisions, next.getT());
-                        } else {
-                            table.updateCollision_ns(next, collisions);
-                            table.updateCollisionTimes(collisions, next.getT());
-                            if (next.getIdx1() != -1) {
-                                Particle p = table.getByIdx(next.getIdx1());
-                                if (p != null)
-                                    table.updateAfterCollision(collisions, p);
-                            }
-                            if (next.getIdx2() != -1) {
-                                Particle p = table.getByIdx(next.getIdx2());
-                                if (p != null)
-                                    table.updateAfterCollision(collisions, p);
-                            }
-                        }//hago el choque
-
-    //                System.out.println("---------------ANTES DE SALIR---------------------------");
-    //                for(Collision col : collisions) {
-    //                    System.out.println("collision: " + col.getIdx1() + " - " + col.getIdx2() + ": " + col.getT());
-    //                }
-                        totalTime += next.getT();
-                        i++;
+                        System.out.println("Tiempos totales:\nPromedio = " + arraySum(collisionTimes)/collisionTimes.length
+                        + "StdDev = " + calculateStandardDeviation(collisionTimes));
+                        System.out.println(Arrays.toString(collisionTimes));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    OutputParser.takeSnapshot(output, particles, i);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+
+                    times.add(totalTime);
+                    //            System.out.printf("\nTiempo total hasta que todas las bolas ingresaron a los huecos: %f\n", totalTime);
                 }
 
-                times.add(totalTime);
-    //            System.out.printf("\nTiempo total hasta que todas las bolas ingresaron a los huecos: %f\n", totalTime);
+                //times.removeIf(a -> (a >= 2000));
+                double avg = (times.stream().mapToDouble(a -> a).sum()) / ((long) times.size());
+                double[] array = times.stream().mapToDouble(Double::doubleValue).toArray();
+                double stdDev = calculateStandardDeviation(array);
+
+                System.out.println("Total times with initial v=" + initial_velocity + ": "
+                        + "\nAverage: " + avg + "\nStdDev: " + stdDev);
+                finalTimes[timesCounter++] = avg;
+
             }
-
-        times.removeIf(a -> (a >= 2000));
-        double avg = (times.stream().mapToDouble(a -> a).sum()) / ((long) times.size());
-        double[] array = times.stream().mapToDouble(Double::doubleValue).toArray();
-        double stdDev = calculateStandardDeviation(array);
-
-        System.out.println("\n\nTotal times with initial y=" + initial_y + ": " + times
-                + "\nAverage: " + avg + "\nStdDev: " + stdDev);
-            finalTimes[timesCounter++] = avg;
+            System.out.println(Arrays.toString(heights));
+            System.out.println(Arrays.toString(velocities));
+            System.out.println(Arrays.toString(finalTimes));
+            //System.out.println("Altura inicial: " + Arrays.toString(heights) +
+            //        "\nTiempos promedio: " + Arrays.toString(finalTimes));
         }
-        System.out.println("Altura inicial: " + Arrays.toString(heights) +
-                "\nTiempos promedio: " + Arrays.toString(finalTimes));
     }
 
 }
