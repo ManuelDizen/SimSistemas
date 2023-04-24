@@ -47,75 +47,81 @@ public class PoolTable {
         return (MAX_EPSILON - Math.random() * 0.0001) / Math.sqrt(2);
     }
 
-    private void generateParticles() {
+    private void generateParticles(int scale) {
 
         //agujeros
-        particles.add(new Particle(0, 0, 0, 0, 0, BALL_RADIUS * 2, 0));
-        particles.add(new Particle(LONG_SIDE / 2, 0, 0, 0, 1, BALL_RADIUS * 2, 0));
-        particles.add(new Particle(LONG_SIDE, 0, 0, 0, 2, BALL_RADIUS * 2, 0));
-        particles.add(new Particle(0, SHORT_SIDE, 0, 0, 3, BALL_RADIUS * 2, 0));
-        particles.add(new Particle(LONG_SIDE / 2, SHORT_SIDE, 0, 0, 4, BALL_RADIUS * 2, 0));
-        particles.add(new Particle(LONG_SIDE, SHORT_SIDE, 0, 0, 5, BALL_RADIUS * 2, 0));
+        particles.add(new Particle(0, 0, 0, 0, 0, BALL_RADIUS * 2, 0, scale));
+        particles.add(new Particle(LONG_SIDE / 2, 0, 0, 0, 1, BALL_RADIUS * 2, 0, scale));
+        particles.add(new Particle(LONG_SIDE, 0, 0, 0, 2, BALL_RADIUS * 2, 0, scale));
+        particles.add(new Particle(0, SHORT_SIDE, 0, 0, 3, BALL_RADIUS * 2, 0, scale));
+        particles.add(new Particle(LONG_SIDE / 2, SHORT_SIDE, 0, 0, 4, BALL_RADIUS * 2, 0, scale));
+        particles.add(new Particle(LONG_SIDE, SHORT_SIDE, 0, 0, 5, BALL_RADIUS * 2, 0, scale));
 
         //bola blanca
-        particles.add(new Particle(INITIAL_X, initial_y, V, 0, 6, BALL_RADIUS, MASS)); //cambiar ángulo
+        particles.add(new Particle(INITIAL_X, initial_y, V, 0, 6, BALL_RADIUS, MASS, scale)); //cambiar ángulo
 
         double initial_triangle_x = LONG_SIDE - 0.56;
         double initial_triangle_y = SHORT_SIDE / 2;
 
         //primera bola
-        particles.add(new Particle(initial_triangle_x, initial_triangle_y, 0, 0, 7, BALL_RADIUS, MASS));
+        particles.add(new Particle(initial_triangle_x, initial_triangle_y, 0, 0, 7, BALL_RADIUS, MASS, scale));
 //        System.out.println(initial_triangle_x + ", " + initial_triangle_y);
 
         //2da fila
         double epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + BALL_RADIUS * 2 + epsilon,
-                initial_triangle_y + BALL_RADIUS + epsilon, 0, 0, 8, BALL_RADIUS, MASS));
+                initial_triangle_y + BALL_RADIUS + epsilon, 0, 0, 8, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + BALL_RADIUS * 2 + epsilon,
-                initial_triangle_y - BALL_RADIUS - epsilon, 0, 0, 9, BALL_RADIUS, MASS));
+                initial_triangle_y - BALL_RADIUS - epsilon, 0, 0, 9, BALL_RADIUS, MASS, scale));
 
         // 3ra fila
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 2 * BALL_RADIUS) + epsilon,
-                initial_triangle_y + ((epsilon) * (Math.random() < 0.5 ? 1 : -1)), 0, 0, 11, BALL_RADIUS, MASS));
+                initial_triangle_y + ((epsilon) * (Math.random() < 0.5 ? 1 : -1)), 0, 0,
+                11, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 2 * BALL_RADIUS) + epsilon,
-                initial_triangle_y + epsilon + (2 * BALL_RADIUS), 0, 0, 10, BALL_RADIUS, MASS));
+                initial_triangle_y + epsilon + (2 * BALL_RADIUS), 0, 0, 10, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 2 * BALL_RADIUS) + epsilon,
-                initial_triangle_y - (2 * BALL_RADIUS) - epsilon, 0, 0, 12, BALL_RADIUS, MASS));
+                initial_triangle_y - (2 * BALL_RADIUS) - epsilon, 0, 0, 12, BALL_RADIUS, MASS, scale));
 
         //4ta fila
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 3 * BALL_RADIUS) + epsilon,
-                initial_triangle_y - (3 * BALL_RADIUS) - epsilon, 0, 0, 16, BALL_RADIUS, MASS));
+                initial_triangle_y - (3 * BALL_RADIUS) - epsilon, 0, 0, 16, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 3 * BALL_RADIUS) + epsilon,
-                initial_triangle_y + (3 * BALL_RADIUS) + epsilon, 0, 0, 13, BALL_RADIUS, MASS));
+                initial_triangle_y + (3 * BALL_RADIUS) + epsilon, 0, 0, 13, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 3 * BALL_RADIUS) + epsilon,
-                initial_triangle_y - BALL_RADIUS - epsilon, 0, 0, 15, BALL_RADIUS, MASS));
+                initial_triangle_y - BALL_RADIUS - epsilon, 0, 0, 15, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 3 * BALL_RADIUS) + epsilon,
-                initial_triangle_y + BALL_RADIUS + epsilon, 0, 0, 14, BALL_RADIUS, MASS));
+                initial_triangle_y + BALL_RADIUS + epsilon, 0, 0, 14, BALL_RADIUS, MASS, scale));
 
         // 5ta fila
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 4 * BALL_RADIUS) + epsilon,
-                initial_triangle_y + ((epsilon) * (Math.random() < 0.5 ? 1 : -1)), 0, 0, 19, BALL_RADIUS, MASS));
+                initial_triangle_y + ((epsilon) * (Math.random() < 0.5 ? 1 : -1)), 0, 0,
+                19, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 4 * BALL_RADIUS) + epsilon,
-                initial_triangle_y + epsilon + (2 * BALL_RADIUS), 0, 0, 18, BALL_RADIUS, MASS));
+                initial_triangle_y + epsilon + (2 * BALL_RADIUS),
+                0, 0, 18, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 4 * BALL_RADIUS) + epsilon,
-                initial_triangle_y - (2 * BALL_RADIUS) - epsilon, 0, 0, 20, BALL_RADIUS, MASS));
+                initial_triangle_y - (2 * BALL_RADIUS) - epsilon,
+                0, 0, 20, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 4 * BALL_RADIUS) + epsilon,
-                initial_triangle_y + (2 * 2 * BALL_RADIUS) + epsilon, 0, 0, 17, BALL_RADIUS, MASS));
+                initial_triangle_y + (2 * 2 * BALL_RADIUS) + epsilon,
+                0, 0, 17, BALL_RADIUS, MASS, scale));
         epsilon = epsilon();
         particles.add(new Particle(initial_triangle_x + (2 * 4 * BALL_RADIUS) + epsilon,
-                initial_triangle_y - (2 * 2 * BALL_RADIUS) - epsilon, 0, 0, 21, BALL_RADIUS, MASS));
+                initial_triangle_y - (2 * 2 * BALL_RADIUS) - epsilon, 0, 0,
+                21, BALL_RADIUS, MASS, scale));
 
 
     }
@@ -152,13 +158,14 @@ public class PoolTable {
         if (time_to_y > 0)
             collisions.add(new Collision(-1, -1, p.getIdx(), p.getCollision_n(),
                     time_to_y));
+
+        int ogIdx = p.getIdx();
         for (Particle k : particles) {
             int i = k.getIdx();
-            if (i != p.getIdx()) {
+            if (i != ogIdx) {
                 double tc = p.timeToParticleCollision(k);
                 if (tc > 0)
-                    collisions.add(new Collision(p.getIdx(), p.getCollision_n(), k.getIdx(), k.getCollision_n(),
-                            tc));
+                    collisions.add(new Collision(p.getIdx(), p.getCollision_n(), k.getIdx(), k.getCollision_n(), tc));
             }
         }
     }
@@ -167,7 +174,7 @@ public class PoolTable {
         return particles.stream().filter(p -> (p.getIdx() == idx)).findFirst().orElse(null);
     }
 
-    private void updateCollision_ns(Collision collision, PriorityQueue<Collision> collisions) {
+    private void updateCollision_ns(Collision collision) {
         Particle aux = null;
         if (collision.getIdx1() == -1) {
             aux = getByIdx(collision.getIdx2());
@@ -188,7 +195,6 @@ public class PoolTable {
     private void updateCollisionPocket(Collision collision,
                                        PriorityQueue<Collision> collisions) {
         int toRemove = collision.getIdx1() <= 5 ? collision.getIdx2() : collision.getIdx1(); // Si llegue hasta acá, uno de los dos es pocket
-//        System.out.println(toRemove);
         particles.removeIf(p -> p.getIdx() == toRemove);
         Predicate<Collision> pr = a -> (a.getIdx1() == toRemove || a.getIdx2() == toRemove);
         collisions.removeIf(pr);
@@ -223,108 +229,101 @@ public class PoolTable {
     }
 
     private void updateCollisionTimes(PriorityQueue<Collision> collisions, double time) {
+        List<Collision> toRemove = new ArrayList<>();
         for (Collision col : collisions) {
             col.elapse(time);
+            if(col.getT() == Double.MIN_VALUE){
+                toRemove.add(col);
+            }
         }
+        collisions.removeAll(toRemove);
     }
 
     public static void main(String[] args) {
         // args[0] = initial y position for white ball
-
-        //double initial_y = Double.parseDouble(args[0]);
-        //double[] heights = {0.42, 0.434, 0.448, 0.462, 0.476, 0.490, 0.504, 0.518, 0.532, 0.546, 0.56};
-        double[] heights = {0.518};
-        //double[] velocities = {0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0, 8.0};
-        //double[] velocities = {2.0, 3.0, 4.0, 6.0, 8.0};
+        double[] heights = {0.56};
         double[] velocities = {2.0};
-        double[] finalTimes = new double[velocities.length];
+        int[] precisions = {20, 16, 12, 8, 4};
+
+
+        double[] finalTimes = new double[precisions.length];
+        double[] stdDevs = new double[precisions.length];
         int timesCounter = 0;
-        int iterations = 1;
+        int iterations = 50;
         for(double initial_y : heights) {
             for (double initial_velocity : velocities) {
-                List<Double> times = new ArrayList<>();
-                for (int iters = 0; iters < iterations; iters++) {
-                    //PoolTable table = new PoolTable(initial_y);
-                    PoolTable table = new PoolTable(initial_y, initial_velocity);
-                    table.generateParticles();
+                for(int precision : precisions) {
+                    List<Double> times = new ArrayList<>();
+                    for (int iters = 0; iters < iterations; iters++) {
+                        PoolTable table = new PoolTable(initial_y, initial_velocity);
+                        table.generateParticles(precision);
 
-                    PriorityQueue<Collision> collisions = new PriorityQueue<>();
-                    double totalTime = 0;
-                    try (FileWriter output = new FileWriter(
-                            String.format("output_y=%f.txt", initial_y))) {
-                        int i = 0;
-                        Collision next;
-                        double[] collisionTimes = new double[MAX_COLLISIONS];
-                        int timesCounter2 = 0;
+                        PriorityQueue<Collision> collisions = new PriorityQueue<>();
                         table.calculateInitialCollisions(collisions);
-                        while (particles.size() > 6) {
+
+                        double totalTime = 0;
+                        try (FileWriter output = new FileWriter(
+                                String.format("output_y=%f_f=%d.txt", initial_y, precision))) {
+                            int i = 0;
+                            Collision next;
+                            double[] collisionTimes = new double[MAX_COLLISIONS*100];
+                            int timesCounter2 = 0;
+                            while (particles.size() > 6) {
+                                OutputParser.takeSnapshot(output, particles, i);
+                                do {
+                                    next = collisions.poll();
+                                    if (next == null) {
+                                        System.out.println("Collisions:" + collisions);
+                                        System.out.println("Particles:");
+                                        for (Particle p : particles)
+                                            System.out.println(p.getIdx() + ", vx=" + p.getVx() + ", vy=" + p.getVy());
+                                        System.out.println("Error de sistema: No quedan colisiones y no se terminaron las partículas.");
+                                        System.exit(1);
+                                    }
+                                } while (!table.isValid(next)); //busco la primera colisión válida
+
+                                collisionTimes[timesCounter2++] = next.getT();
+                                table.updateAllParticles(next.getT());
+
+                                if (next.isPocket()) {
+                                    table.updateCollisionPocket(next, collisions);
+                                    table.updateCollisionTimes(collisions, next.getT());
+                                } else {
+                                    table.updateCollision_ns(next);
+                                    table.updateCollisionTimes(collisions, next.getT());
+
+                                    if (next.getIdx1() != -1) {
+                                        Particle p = table.getByIdx(next.getIdx1());
+                                        if (p != null)
+                                            table.updateAfterCollision(collisions, p);
+                                    }
+                                    if (next.getIdx2() != -1) {
+                                        Particle p = table.getByIdx(next.getIdx2());
+                                        if (p != null)
+                                            table.updateAfterCollision(collisions, p);
+                                    }
+                                }
+                                totalTime += next.getT();
+                                i++;
+                            }
                             OutputParser.takeSnapshot(output, particles, i);
-                            do {
-                                next = collisions.poll();
-                                if (next == null) {
-                                    System.out.println("Collisions:" + collisions);
-                                    System.out.println("Particles:");
-                                    for (Particle p : particles)
-                                        System.out.println(p.getIdx() + ", " + p.getVx() + ", " + p.getVy());
-                                    System.out.println("Error de sistema: No quedan colisiones y no se terminaron las partículas.");
-                                    System.exit(1);
-                                }
-                            } while (!table.isValid(next)); //busco la primera colisión válida
-                            collisionTimes[timesCounter2++] = next.getT();
-                            table.updateAllParticles(next.getT());
-
-                            if (next.isPocket()) {
-                                table.updateCollisionPocket(next, collisions);
-                                table.updateCollisionTimes(collisions, next.getT());
-                            } else {
-                                table.updateCollision_ns(next, collisions);
-                                table.updateCollisionTimes(collisions, next.getT());
-                                if (next.getIdx1() != -1) {
-                                    Particle p = table.getByIdx(next.getIdx1());
-                                    if (p != null)
-                                        table.updateAfterCollision(collisions, p);
-                                }
-                                if (next.getIdx2() != -1) {
-                                    Particle p = table.getByIdx(next.getIdx2());
-                                    if (p != null)
-                                        table.updateAfterCollision(collisions, p);
-                                }
-                            }//hago el choque
-
-                            //                System.out.println("---------------ANTES DE SALIR---------------------------");
-                            //                for(Collision col : collisions) {
-                            //                    System.out.println("collision: " + col.getIdx1() + " - " + col.getIdx2() + ": " + col.getT());
-                            //                }
-                            totalTime += next.getT();
-                            i++;
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
-                        OutputParser.takeSnapshot(output, particles, i);
-                        System.out.println("Tiempos totales:\nPromedio = " + arraySum(collisionTimes)/collisionTimes.length
-                        + "StdDev = " + calculateStandardDeviation(collisionTimes));
-                        System.out.println(Arrays.toString(collisionTimes));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+
+                        times.add(totalTime);
                     }
 
-                    times.add(totalTime);
-                    //            System.out.printf("\nTiempo total hasta que todas las bolas ingresaron a los huecos: %f\n", totalTime);
+                    double avg = (times.stream().mapToDouble(a -> a).sum()) / ((long) times.size());
+                    double[] array = times.stream().mapToDouble(Double::doubleValue).toArray();
+                    double stdDev = calculateStandardDeviation(array);
+
+                    System.out.println("Total times with initial v=" + initial_velocity + ", precision=" + precision +
+                    ": " + "\nAverage: " + avg + "\nStdDev: " + stdDev);
+                    stdDevs[timesCounter] = stdDev;
+                    finalTimes[timesCounter++] = avg;
                 }
-
-                //times.removeIf(a -> (a >= 2000));
-                double avg = (times.stream().mapToDouble(a -> a).sum()) / ((long) times.size());
-                double[] array = times.stream().mapToDouble(Double::doubleValue).toArray();
-                double stdDev = calculateStandardDeviation(array);
-
-                System.out.println("Total times with initial v=" + initial_velocity + ": "
-                        + "\nAverage: " + avg + "\nStdDev: " + stdDev);
-                finalTimes[timesCounter++] = avg;
-
             }
-            System.out.println(Arrays.toString(heights));
-            System.out.println(Arrays.toString(velocities));
-            System.out.println(Arrays.toString(finalTimes));
-            //System.out.println("Altura inicial: " + Arrays.toString(heights) +
-            //        "\nTiempos promedio: " + Arrays.toString(finalTimes));
         }
     }
 
