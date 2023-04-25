@@ -1,0 +1,27 @@
+- No numerar Secciones.
+
+- Usar una estructura de títulos y subtítulos uniforme en toda la presentacion (Resultados es distinta a las anteriores).
+
+- D13. epsilon no es una variable del sistema a estudiar.
+
+- Faltó Explicar posiciones iniciales de las bolas del triangulo.
+
+- D14 no escribir formulas generales conocidas. Lo que hay que explicar es que conjunto/s de datos se toman para calcular esas formulas (de una realizacion primero, luego se promedia entre varias realizaciones? de todas las realizaciones juntas?, etc..etc).
+
+- D14: Definir los simbolos matematicos que se usarán para los observables.
+
+- D18: IMPORTANTE: No interpolar curvas de datos (en este caso PDF) sin una predicción teórica. 
+
+- D3: No redactar.
+
+- D5 , D6 y otras escirbir las ecuaciones con igual tamaño de fuente y definicion aceptable. Si la estan copiando de otro lado (que no se note). Sino usar cualquier editor de ecuaciones como "LateXtIt".
+
+-D17: no son "iteraciones", son "realizaciones".
+
+D20 y D21. No se especificó si las simulaciones para comparar precision , tienen la misma semilla del generador random.
+
+- D21. Nombres de los ejes alrevés.
+
+- D22: Faltan barras de error, o especificar cuantas realizaciones se hicieron de cada condición.
+
+- Bien por hacer el punto optativo.
