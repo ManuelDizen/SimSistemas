@@ -12,7 +12,7 @@ public class Beeman implements IntegrationMethod{
         this.delta_t = delta_t;
     }
 
-    public Pair<Double> updateParams(Particle p){
+    public void updateParams(Particle p){
         double curr_x = p.getX();
         double curr_vx = p.getVx();
         double mass = p.getMass();
@@ -35,8 +35,5 @@ public class Beeman implements IntegrationMethod{
         p.setPrev_vx(curr_vx);
         p.setX(next_x);
         p.setVx(next_vx_corrected);
-
-        return new Pair<>(next_x, next_vx_corrected);
-
     }
 }

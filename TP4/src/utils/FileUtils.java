@@ -8,11 +8,11 @@ import java.util.Locale;
 
 public class FileUtils {
 
-    private static final String path = "output";
-    public void takePositionSnapshot(Particle p, String name){
+    private static final String path = "src/output";
+    public void takePositionSnapshot(Particle p, String name, double delta_t){
         try{
             BufferedWriter writer = new BufferedWriter(new FileWriter(
-                    new File(name + ".txt"), true));
+                    new File(path + "/" + name + delta_t + ".txt"), true));
             String builder =
                     String.format(Locale.US, "%6.7e", p.getX()) + "    " +
                             String.format(Locale.US, "%6.7e", p.getY()) + "    ";
