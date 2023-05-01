@@ -12,6 +12,7 @@ public class Beeman implements IntegrationMethod{
         this.delta_t = delta_t;
     }
 
+    @Override
     public void updateParams(Particle p){
         double curr_x = p.getX();
         double curr_vx = p.getVx();

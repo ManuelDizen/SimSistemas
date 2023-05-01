@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static IntegrationMethods.Euler.calculateEulerR;
+
 public class OscillatorRunnable {
 
     private static final double amplitude = 1.0;
@@ -29,9 +31,9 @@ public class OscillatorRunnable {
                 0, 1, 1, mass, 1);
         Particle p3 = new Particle(1, 0, initial_vx,
                 0, 1, 1, mass, 1);
-        runGear(p3, osc.getK());
         runBeeman(p1);
-        testVerlet(p2);
+        runVerlet(p2);
+        runGear(p3, osc.getK());
     }
 
     public static void runBeeman(Particle p){
@@ -44,32 +46,20 @@ public class OscillatorRunnable {
             t += delta_t;
             ctr++;
         }
-        System.out.println("ctr:" + ctr);
     }
 
     public static void runVerlet(Particle p){
-        VerletOriginal verlet = new VerletOriginal(delta_t);
-        verlet.startParameters(p);
-        double t = 0;
-        while(t < total_time){
-            fileUtils.takePositionSnapshot(p, "verlet", delta_t);
-            verlet.updateParams(p);
-            t += delta_t;
-        }
-    }
-
-    public static void testVerlet(Particle p){
         double currR = p.getX();
         double currV = p.getVx();
         double mass = p.getMass();
 
-        double prevR = eulerR(currR, currV, -delta_t, mass, osc.calculateForce(currR, currV));
+        double prevR = calculateEulerR(currR, currV, -delta_t, mass, osc.calculateForce(currR, currV));
 
         double t = 0;
 
         double nextR;
 
-        while (t < 5) {
+        while (t < total_time) {
             fileUtils.takePositionSnapshot(currR, currV, "verlet", delta_t);
             nextR = 2 * currR - prevR + (Math.pow(delta_t, 2) * osc.calculateForce(currR, currV)) / mass;
             currV = (nextR - prevR) / (2 * delta_t);
@@ -77,10 +67,6 @@ public class OscillatorRunnable {
             currR = nextR;
             t += delta_t;
         }
-    }
-
-    public static double eulerR(double r, double v, double step, double mass, double f) {
-        return r + step * v + step * step * f / (2 * mass);
     }
 
     public static void runGear(Particle p, double k){
