@@ -4,7 +4,7 @@ import System1.DampedOscillator;
 import utils.Pair;
 import utils.Particle;
 
-public class Beeman {
+public class Beeman implements IntegrationMethod{
     private final double delta_t;
     private final DampedOscillator oscillator = new DampedOscillator();
 

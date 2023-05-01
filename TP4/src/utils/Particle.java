@@ -37,6 +37,12 @@ public class Particle {
         this.radius = radius;
         this.mass = mass;
         this.scale = scale;
+        this.prev_x = 0.0;
+        this.prev_vx = 0.0;
+        this.prev_ax = 0.0;
+        this.prev_y = 0.0;
+        this.prev_vy = 0.0;
+        this.prev_ay = 0.0;
     }
 
     public double getPrev_x() {
