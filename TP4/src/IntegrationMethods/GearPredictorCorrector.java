@@ -10,7 +10,7 @@ import java.util.List;
 /*
 TODO: Me falta en todos los métodos pasar bien a archivos para hacer gráficos
  */
-public class GearPredictorCorrector implements IntegrationMethod{
+public class GearPredictorCorrector{
     private final double delta_t;
     private final int deriv_n = 5;
     private Double[] gpArray = new Double[deriv_n+1];
@@ -46,50 +46,15 @@ public class GearPredictorCorrector implements IntegrationMethod{
         derivatives.add(5, km * derivatives.get(3));
     }
 
-    public List<Double> predict(){
-        List<Double> predictions = new ArrayList<>(derivatives);
-        System.out.println(predictions);
-        double sum = 0;
-        for(int i = 0; i < predictions.size(); i++){
-            sum = 0;
-            for(int j = 0; j < predictions.size() - i; j++){
-                sum += derivatives.get(i+j) * gpArray[j];
-            }
-            predictions.set(i, sum);
-        }
-        return predictions;
-    }
-
-    @Override
-    public void updateParams(Particle p) {
-
-        List<Double> preds = predict();
-        Double delta_r2 = getR2value(preds.get(0), preds.get(1), preds.get(2), p.getMass());
-        System.out.println("X antes: " + preds.get(0));
-        for(int i = 0; i < preds.size(); i++){
-            preds.set(i, preds.get(i) + ((alphas_w_v[i]*delta_r2*factorial(i)) / Math.pow(delta_t, i)));
-        }
-        System.out.println("X después: " + preds.get(0));
-        p.setPrev_x(p.getX());
-        p.setPrev_vx(p.getVx());
-        p.setPrev_ax(p.getAx());
-        p.setX(preds.get(0));
-        p.setVx(preds.get(1));
-    }
-
-    private Double getR2value(Double x, Double vx, Double ax, Double mass){
-        double next_ax = oscillator.calculateForce(x, vx) / mass;
-        return ((next_ax - ax) * Math.pow(delta_t, 2))/2;
-    }
-
 
     public Double[] makePrediction(Double[] derivs){
         Double[] ret = derivs.clone();
         double aux;
         for(int i = 0; i < ret.length; i++){
             aux = 0;
-            for(int j = 0; j < ret.length - i; j++)
+            for(int j = 0; j < ret.length - i; j++) {
                 aux += derivs[i + j] * gpArray[j];
+            }
             ret[i] = aux;
         }
         return ret;
@@ -97,7 +62,7 @@ public class GearPredictorCorrector implements IntegrationMethod{
 
     public Double evaluateAcceleration(Double r0, Double r1, Double r2, Particle p){
         double accel = oscillator.calculateForce(r0, r1) / p.getMass();
-        return (accel - r2) * delta_t * delta_t / 2;
+        return (accel - r2) * delta_t * delta_t / 2; // 2! = 2
     }
 
     public Double[] calculateInitialDerivs(Particle p, int n, double k){
@@ -113,12 +78,18 @@ public class GearPredictorCorrector implements IntegrationMethod{
     }
 
     public Double[] gearPredictor(Double[] derivs, Particle p){
-        Double[] predictions = makePrediction(derivs);
-        double deltaR2 = evaluateAcceleration(predictions[0], predictions[1], predictions[2], p);
-        for(int i = 0; i < predictions.length; i++){
-            predictions[i] += alphas_w_v[i] * deltaR2 * factorial(i) / Math.pow(delta_t, i);
+        Double[] preds = makePrediction(derivs);
+        double deltaR2 = evaluateAcceleration(preds[0], preds[1], preds[2], p);
+        correctPredictions(preds, deltaR2);
+        p.setX(preds[0]);
+        p.setVx(preds[1]);
+        return preds;
+    }
+
+    private void correctPredictions(Double[] preds, double deltaR2){
+        for(int i = 0; i < preds.length; i++){
+            preds[i] += alphas_w_v[i] * deltaR2 * factorial(i) / Math.pow(delta_t, i);
         }
-        return predictions;
     }
 
 }

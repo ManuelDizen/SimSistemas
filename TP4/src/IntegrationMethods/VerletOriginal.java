@@ -45,4 +45,6 @@ public class VerletOriginal implements IntegrationMethod
     public static double updateVerletX(double currR, double r, double step, double mass, double f) {
         return 2 * currR - r + (Math.pow(step, 2) * f) / mass;
     }
+
+
 }
