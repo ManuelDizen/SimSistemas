@@ -9,4 +9,36 @@ public class DampedOscillator {
     public double calculateForce(double pos, double vel){
         return (-k * pos) - (gamma * vel);
     }
+
+    public int getMass() {
+        return mass;
+    }
+
+    public void setMass(int mass) {
+        this.mass = mass;
+    }
+
+    public double getK() {
+        return k;
+    }
+
+    public void setK(double k) {
+        this.k = k;
+    }
+
+    public int getGamma() {
+        return gamma;
+    }
+
+    public void setGamma(int gamma) {
+        this.gamma = gamma;
+    }
+
+    public double getTotal_time() {
+        return total_time;
+    }
+
+    public void setTotal_time(double total_time) {
+        this.total_time = total_time;
+    }
 }

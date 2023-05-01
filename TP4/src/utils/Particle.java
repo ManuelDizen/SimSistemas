@@ -25,7 +25,7 @@ public class Particle {
     private double mass;
     private int collision_n = 0;
 
-    public boolean PRECISION_TEST = true;
+    public boolean PRECISION_TEST = false;
     public int scale = 3;
 
     public Particle(double x, double y, double vx, double vy, int idx, double radius, double mass, int scale) {

@@ -19,7 +19,7 @@ public class GearPredictorCorrector implements IntegrationMethod{
     private final Double[] alphas_w_v =
             new Double[]{ (3 / 16.0), (251/360.0), 1.0, (11/18.0), (1/6.0), (1/60.0)};
 
-    private final List<Double> derivatives = new ArrayList<>(deriv_n + 1);
+    private List<Double> derivatives = new ArrayList<>(deriv_n + 1);
 
     public GearPredictorCorrector(double delta_t){
         this.delta_t = delta_t;
@@ -37,13 +37,13 @@ public class GearPredictorCorrector implements IntegrationMethod{
     public void calculateInitial(Particle p, double k){
         double x = p.getX();
         double vx = p.getVx();
-        derivatives.set(0, x);
-        derivatives.set(1, vx);
+        derivatives.add(0, x);
+        derivatives.add(1, vx);
         double km = -k / p.getMass();
-        derivatives.set(2, km * x);
-        derivatives.set(3, km * derivatives.get(1));
-        derivatives.set(4, km * derivatives.get(2));
-        derivatives.set(5, km * derivatives.get(3));
+        derivatives.add(2, km * x);
+        derivatives.add(3, km * derivatives.get(1));
+        derivatives.add(4, km * derivatives.get(2));
+        derivatives.add(5, km * derivatives.get(3));
     }
 
     public List<Double> predict(){
