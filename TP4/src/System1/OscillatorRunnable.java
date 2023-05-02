@@ -17,7 +17,7 @@ import static IntegrationMethods.Euler.calculateEulerR;
 public class OscillatorRunnable {
 
     private static final double amplitude = 1.0;
-    private static final double delta_t = Math.pow(10, -2);
+    private static double delta_t = Math.pow(10, -2);
     private static final double total_time = 5; // s
     private static final FileUtils fileUtils = new FileUtils();
     private static final DampedOscillator osc = new DampedOscillator();
@@ -25,15 +25,19 @@ public class OscillatorRunnable {
         FileUtils.purgeDirectory(new File("src/output"));
         int mass = osc.getMass();
         double initial_vx = (-amplitude * osc.getGamma())/(2.0*mass);
-        Particle p1 = new Particle(1, 0, initial_vx,
-                0, 1, 1, mass, 1);
-        Particle p2 = new Particle(1, 0, initial_vx,
-                0, 1, 1, mass, 1);
-        Particle p3 = new Particle(1, 0, initial_vx,
-                0, 1, 1, mass, 1);
-        runBeeman(p1);
-        runVerlet(p2);
-        runGear(p3, osc.getK());
+        double[] delta_ts = {-2, -3, -4, -5};
+        for(double t : delta_ts) {
+            delta_t = Math.pow(10, t);
+            Particle p1 = new Particle(1, 0, initial_vx,
+                    0, 1, 1, mass, 1);
+            Particle p2 = new Particle(1, 0, initial_vx,
+                    0, 1, 1, mass, 1);
+            Particle p3 = new Particle(1, 0, initial_vx,
+                    0, 1, 1, mass, 1);
+            runBeeman(p1);
+            runVerlet(p2);
+            runGear(p3, osc.getK());
+        }
     }
 
     public static void runBeeman(Particle p){
