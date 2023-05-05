@@ -28,7 +28,7 @@ public class Particle {
     public boolean PRECISION_TEST = false;
     public int scale = 3;
 
-    public Particle(double x, double y, double vx, double vy, int idx, double radius, double mass, int scale) {
+    public Particle(double x, double y, double vx, double vy, int idx, double radius, double mass) {
         this.x = x;
         this.y = y;
         this.vx = vx;

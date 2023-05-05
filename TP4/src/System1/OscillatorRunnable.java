@@ -2,16 +2,10 @@ package System1;
 
 import IntegrationMethods.Beeman;
 import IntegrationMethods.GearPredictorCorrector;
-import IntegrationMethods.VerletOriginal;
 import utils.FileUtils;
-import utils.Pair;
 import utils.Particle;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import static IntegrationMethods.Euler.calculateEulerR;
 
 public class OscillatorRunnable {
@@ -29,11 +23,11 @@ public class OscillatorRunnable {
         for(double t : delta_ts) {
             delta_t = Math.pow(10, t);
             Particle p1 = new Particle(1, 0, initial_vx,
-                    0, 1, 1, mass, 1);
+                    0, 1, 1, mass);
             Particle p2 = new Particle(1, 0, initial_vx,
-                    0, 1, 1, mass, 1);
+                    0, 1, 1, mass);
             Particle p3 = new Particle(1, 0, initial_vx,
-                    0, 1, 1, mass, 1);
+                    0, 1, 1, mass);
             runBeeman(p1);
             runVerlet(p2);
             runGear(p3, osc.getK());

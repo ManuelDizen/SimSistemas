@@ -34,18 +34,6 @@ public class GearPredictorCorrector{
         if(n == 0 || n == 1) return 1;
         return n * factorial(n-1);
     }
-    public void calculateInitial(Particle p, double k){
-        double x = p.getX();
-        double vx = p.getVx();
-        derivatives.add(0, x);
-        derivatives.add(1, vx);
-        double km = -k / p.getMass();
-        derivatives.add(2, km * x);
-        derivatives.add(3, km * derivatives.get(1));
-        derivatives.add(4, km * derivatives.get(2));
-        derivatives.add(5, km * derivatives.get(3));
-    }
-
 
     public Double[] makePrediction(Double[] derivs){
         Double[] ret = derivs.clone();
