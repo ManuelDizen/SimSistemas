@@ -6,8 +6,7 @@ import utils.Particle;
 
 import static IntegrationMethods.Euler.calculateEulerR;
 
-public class VerletOriginal implements IntegrationMethod
-{
+public class VerletOriginal implements IntegrationMethod {
     private final double delta_t;
 
     private double curr_vx;
