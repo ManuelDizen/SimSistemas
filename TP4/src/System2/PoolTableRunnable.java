@@ -55,10 +55,19 @@ public class PoolTableRunnable {
                 // table.updateAllParticles(delta_t);
             }
             else{
-                /*TODO: Se produjo la colisión: Hay que actualizar los valores calculando
+                /*
+                TODO: Se produjo la colisión: Hay que actualizar los valores calculando
                 la fuerza con la formula dada. Mientras no se produce esto, es un mero MRUV
                 (Igual habría que cambiar el updateAllParticles para que se comporte con las formulas
                 de gear esperadas.
+
+                El tema ahora es calcular cuando hay una colisión. Dos formas rápidas:
+                1) CIM (paja)
+                2) Brute Force (ineficiente, no paja)
+
+                Cualquiera sea de las dos, hay que implementar cuando |ri - rj| < Ri + Rj
+                En caso de la pared, la fuerza es la misma (le pregunte a Germán) solo que
+                la condición de corte sería algo como rix >= MAX_X o riy >= MAX_Y
                  */
                 // table. makeCollision();
                 current_collision = null;
