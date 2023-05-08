@@ -15,12 +15,12 @@ import static utils.StatisticsUtils.calculateStandardDeviation;
 public class PoolTable {
 
     private static final int MAX_COLLISIONS = 1000;
-    private static List<Particle> particles;
+    private static List<Particle> particles = new ArrayList<>();
 
     private static final double LONG_SIDE = 2.24; // m
 
     private static final double SHORT_SIDE = 1.12; // m
-    private final double V; // m/s
+    private final double V = 2; // m/s
     private static final double INITIAL_X = 0.56; // m
     private static final double BALL_RADIUS = 0.0285; // m
 
@@ -32,21 +32,15 @@ public class PoolTable {
 
     private final double initial_y;
 
+    private final double delta_t;
+
     private static PriorityQueue<Collision> collisions = new PriorityQueue<>();
 
-    public PoolTable(double initial_y) {
+    public PoolTable(double initial_y, double delta_t){
         this.initial_y = initial_y;
-        this.particles = new ArrayList<>();
-        this.V = 2.0;
+        this.delta_t = delta_t;
     }
-
-    public PoolTable(double initial_y, double initial_velocity){
-        this.initial_y = initial_y;
-        this.particles = new ArrayList<>();
-        this.V = initial_velocity;
-    }
-
-
+    
     private double epsilon() {
         return (MAX_EPSILON - Math.random() * 0.0001) / Math.sqrt(2);
     }
@@ -283,7 +277,7 @@ public class PoolTable {
                 for(int precision : precisions) {
                     List<Double> times = new ArrayList<>();
                     for (int iters = 0; iters < iterations; iters++) {
-                        PoolTable table = new PoolTable(initial_y, initial_velocity);
+                        PoolTable table = new PoolTable(initial_y, delta_t);
                         table.generateParticles();
 
                         //PriorityQueue<Collision> collisions = new PriorityQueue<>();

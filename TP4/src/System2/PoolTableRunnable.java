@@ -11,7 +11,7 @@ public class PoolTableRunnable {
 
     public static void main(String[] args) {
         double initial_y = Double.parseDouble(args[0]);
-        table = new PoolTable(initial_y);
+        table = new PoolTable(initial_y, delta_t);
         boolean buchacas = args[1] != null && args[1] == "buchacas";
         if(buchacas) {
             System.out.println("Corro con buchacas!\n");
