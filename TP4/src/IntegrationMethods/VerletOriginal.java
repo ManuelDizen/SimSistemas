@@ -30,5 +30,8 @@ public class VerletOriginal implements IntegrationMethod {
         curr_vx = (next_r - prev_r) / (2 * delta_t);
         prev_r = curr_r;
         curr_r = next_r;
+
+        p.setX(curr_r);
+        p.setVx(curr_vx);
     }
 }

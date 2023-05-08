@@ -20,7 +20,7 @@ public class OscillatorRunnable {
         FileUtils.purgeDirectory(new File("src/output"));
         int mass = osc.getMass();
         double initial_vx = (-amplitude * osc.getGamma())/(2.0*mass);
-        double[] delta_ts = {-2, -3, -4, -5};
+        double[] delta_ts = {-2, -3, -4};
         for(double t : delta_ts) {
             delta_t = Math.pow(10, t);
             Particle p1 = new Particle(1, 0, initial_vx,

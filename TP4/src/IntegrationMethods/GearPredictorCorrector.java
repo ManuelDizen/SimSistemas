@@ -64,7 +64,10 @@ public class GearPredictorCorrector implements IntegrationMethod{
     public void updateParams(Particle p){
         Double[] preds = makePrediction(derivs);
         double deltaR2 = evaluateAcceleration(preds[0], preds[1], preds[2], p);
+
         correctPredictions(preds, deltaR2);
+        derivs = preds;
+
         p.setX(preds[0]);
         p.setVx(preds[1]);
     }
