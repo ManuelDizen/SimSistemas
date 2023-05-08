@@ -1,25 +1,20 @@
 package IntegrationMethods;
 
 import System1.DampedOscillator;
-import utils.Pair;
 import utils.Particle;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-TODO: Me falta en todos los métodos pasar bien a archivos para hacer gráficos
- */
-public class GearPredictorCorrector{
+public class GearPredictorCorrector implements IntegrationMethod{
     private final double delta_t;
     private final int deriv_n = 5;
-    private Double[] gpArray = new Double[deriv_n+1];
+    private final Double[] gpArray = new Double[deriv_n+1];
     private final DampedOscillator oscillator = new DampedOscillator();
+    private Double[] derivs = new Double[deriv_n + 1];
 
     private final Double[] alphas_w_v =
             new Double[]{ (3 / 16.0), (251/360.0), 1.0, (11/18.0), (1/6.0), (1/60.0)};
-
-    private List<Double> derivatives = new ArrayList<>(deriv_n + 1);
 
     public GearPredictorCorrector(double delta_t){
         this.delta_t = delta_t;
@@ -62,16 +57,16 @@ public class GearPredictorCorrector{
         ret[3] = km * ret[1];
         ret[4] = km * km * p.getX();
         ret[5] = km * km * ret[1];
+        derivs = ret;
         return ret;
     }
 
-    public Double[] gearPredictor(Double[] derivs, Particle p){
+    public void updateParams(Particle p){
         Double[] preds = makePrediction(derivs);
         double deltaR2 = evaluateAcceleration(preds[0], preds[1], preds[2], p);
         correctPredictions(preds, deltaR2);
         p.setX(preds[0]);
         p.setVx(preds[1]);
-        return preds;
     }
 
     private void correctPredictions(Double[] preds, double deltaR2){

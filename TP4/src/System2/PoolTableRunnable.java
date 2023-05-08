@@ -51,6 +51,7 @@ public class PoolTableRunnable {
                 // habría que hacerlo independiente de las condiciones
                 // Esto quiere decir que el updateAllParticles debería actualizar los parámetros de gear nomas
                 // y no valerse de la definición de MRUV (entiendo eso)
+
                 // table.updateAllParticles(delta_t);
             }
             else{

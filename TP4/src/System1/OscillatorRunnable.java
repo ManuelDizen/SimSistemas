@@ -2,6 +2,7 @@ package System1;
 
 import IntegrationMethods.Beeman;
 import IntegrationMethods.GearPredictorCorrector;
+import IntegrationMethods.VerletOriginal;
 import utils.FileUtils;
 import utils.Particle;
 
@@ -37,43 +38,30 @@ public class OscillatorRunnable {
     public static void runBeeman(Particle p){
         Beeman beeman = new Beeman(delta_t);
         double t = 0;
-        int ctr = 0;
         while(t < total_time){
             fileUtils.takePositionSnapshot(p, "beeman", delta_t);
             beeman.updateParams(p);
             t += delta_t;
-            ctr++;
         }
     }
 
     public static void runVerlet(Particle p){
-        double currR = p.getX();
-        double currV = p.getVx();
-        double mass = p.getMass();
-
-        double prevR = calculateEulerR(currR, currV, -delta_t, mass, osc.calculateForce(currR, currV));
-
+        VerletOriginal verlet = new VerletOriginal(delta_t, p.getX(), p.getVx(), p.getMass());
         double t = 0;
-
-        double nextR;
-
         while (t < total_time) {
-            fileUtils.takePositionSnapshot(currR, currV, "verlet", delta_t);
-            nextR = 2 * currR - prevR + (Math.pow(delta_t, 2) * osc.calculateForce(currR, currV)) / mass;
-            currV = (nextR - prevR) / (2 * delta_t);
-            prevR = currR;
-            currR = nextR;
+            fileUtils.takePositionSnapshot(p, "verlet", delta_t);
+            verlet.updateParams(p);
             t += delta_t;
         }
     }
 
     public static void runGear(Particle p, double k){
         GearPredictorCorrector gear = new GearPredictorCorrector(delta_t);
-        Double[] derivs = gear.calculateInitialDerivs(p, 5, k);
+        gear.calculateInitialDerivs(p, 5, k);
         double t = 0;
         while(t < total_time){
             fileUtils.takePositionSnapshot(p, "gear", delta_t);
-            derivs = gear.gearPredictor(derivs, p);
+            gear.updateParams(p);
             t += delta_t;
         }
     }
