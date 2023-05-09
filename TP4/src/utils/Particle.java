@@ -1,7 +1,12 @@
 package utils;
 
+import IntegrationMethods.GearPredictorCorrector;
+import System2.PoolTableRunnable;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import static System2.PoolTableRunnable.k;
 
 public class Particle {
 
@@ -28,6 +33,8 @@ public class Particle {
     public boolean PRECISION_TEST = false;
     public int scale = 3;
 
+    private static GearPredictorCorrector gear;
+
     public Particle(double x, double y, double vx, double vy, int idx, double radius, double mass) {
         this.x = x;
         this.y = y;
@@ -36,13 +43,15 @@ public class Particle {
         this.idx = idx;
         this.radius = radius;
         this.mass = mass;
-        this.scale = scale;
         this.prev_x = 0.0;
         this.prev_vx = 0.0;
         this.prev_ax = 0.0;
         this.prev_y = 0.0;
         this.prev_vy = 0.0;
         this.prev_ay = 0.0;
+
+        gear = new GearPredictorCorrector(PoolTableRunnable.delta_t);
+        gear.calculateInitialDerivs(this, 5, k);
     }
 
     public double getPrev_x() {
@@ -252,5 +261,26 @@ public class Particle {
         other.vy = other.vy - (Jy/other.mass);
 
         this.collision_n++;
+    }
+
+    public double getNorm(Particle other){
+        return Math.sqrt(Math.pow(other.getX() - this.getX(), 2) + Math.pow(other.getY() - this.getY(), 2));
+        //TODO: chequear si esto está bien vengo para atrás con geometría
+        // Escribi esto: √((xj - xi)^2 + (yj - yi)^2)
+    }
+
+
+    public double[] calculateForce(Particle other){
+        double norm = getNorm(other);
+        double[] normal = new double[2];
+        normal[0] = (other.getX() - this.getX())/norm;
+        normal[1] = (other.getY() - this.getY())/norm;
+
+        double[] toRet = new double[2];
+        double constant = k * (norm - (this.radius + other.radius));
+        toRet[0]=constant*normal[0];
+        toRet[1]=constant*normal[1];
+
+        return toRet;
     }
 }

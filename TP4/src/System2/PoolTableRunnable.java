@@ -5,14 +5,16 @@ public class PoolTableRunnable {
     // mientras que en el 2 se varía la posición inicial de la bola tmb
 
     private static PoolTable table;
-    private static final double delta_t = -2;
+    public static final double delta_t = -2;
+
+    public static final double k = Math.pow(10, 4);
 
     private static final double total_time = 100;
 
     public static void main(String[] args) {
         double initial_y = Double.parseDouble(args[0]);
         table = new PoolTable(initial_y, delta_t);
-        boolean buchacas = args[1] != null && args[1] == "buchacas";
+        boolean buchacas = args[1] != null && args[1].equals("buchacas");
         if(buchacas) {
             System.out.println("Corro con buchacas!\n");
             runWithBuchacas();
