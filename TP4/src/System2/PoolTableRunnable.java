@@ -18,7 +18,7 @@ public class PoolTableRunnable {
         }
         else {
             System.out.println("Corro sin buchacas con delta_t " + delta_t + "\n");
-            runWithoutBuchacas(delta_t);
+            runWithoutBuchacas(Math.pow(10, delta_t));
         }
     }
 
@@ -31,7 +31,6 @@ public class PoolTableRunnable {
         table.generateParticlesNoBuchacas();
         double elapsed_time = 0;
         while(elapsed_time < total_time){
-            
             for(int i = 0; i < table.particles.size(); i++){
                 Particle p = table.particles.get(i);
                 for(int j = i + 1; j < table.particles.size(); j++){
