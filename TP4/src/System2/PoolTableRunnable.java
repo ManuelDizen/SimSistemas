@@ -1,9 +1,6 @@
 package System2;
-
+import utils.Particle;
 public class PoolTableRunnable {
-    // Según enunciado, en punto 1 se varía el delta_t unicamente
-    // mientras que en el 2 se varía la posición inicial de la bola tmb
-
     private static PoolTable table;
     public static final double delta_t = -2;
 
@@ -31,57 +28,32 @@ public class PoolTableRunnable {
     }
 
     public static void runWithoutBuchacas(double delta_t){
-        /*
-        1) Creo tabla
-        2) Creo partículas SIN buchacas
-        3) Itero hasta que el tiempo termina
-         */
         table.generateParticlesNoBuchacas();
-        table.calculateInitialCollisions();
-
         double elapsed_time = 0;
-        // Vamos a tener un boolean que indique si necesitamos
-        // buscar una proxima colisión
-        Collision current_collision = null;
         while(elapsed_time < total_time){
-            if(current_collision == null){
-                current_collision = table.getNextCollision();
-            }
-            if(elapsed_time + delta_t < current_collision.getT()) {
-                // TODO: Rehacer método para actualizar las condiciones de partícula con
-                // método de integració gear. Por abajo, es solo actualizar con MRUV pero
-                // habría que hacerlo independiente de las condiciones
-                // Esto quiere decir que el updateAllParticles debería actualizar los parámetros de gear nomas
-                // y no valerse de la definición de MRUV (entiendo eso)
-
-                // table.updateAllParticles(delta_t);
-            }
-            else{
-                /*
-                TODO: Se produjo la colisión: Hay que actualizar los valores calculando
-                la fuerza con la formula dada. Mientras no se produce esto, es un mero MRUV
-                (Igual habría que cambiar el updateAllParticles para que se comporte con las formulas
-                de gear esperadas.
-
-                El tema ahora es calcular cuando hay una colisión. Dos formas rápidas:
-                1) CIM (paja)
-                2) Brute Force (ineficiente, no paja)
-
-                Cualquiera sea de las dos, hay que implementar cuando |ri - rj| < Ri + Rj
-                En caso de la pared, la fuerza es la misma (le pregunte a Germán) solo que
-                la condición de corte sería algo como rix >= MAX_X o riy >= MAX_Y
-                 */
-                // table. makeCollision();
-                current_collision = null;
+            
+            for(int i = 0; i < table.particles.size(); i++){
+                Particle p = table.particles.get(i);
+                for(int j = i + 1; j < table.particles.size(); j++){
+                    Particle q = table.particles.get(j);
+                    if(p.getNorm(q) < (p.getRadius() + q.getRadius())){
+                        // p.applyUpdateWithForce(q);
+                    }
+                    else if(p.getX() >= table.LONG_SIDE || p.getX() <= 0){
+                        // p.applyBounceWithVerticalWall();
+                    }
+                    else if(p.getY() >= table.SHORT_SIDE || p.getY() <= 0){
+                        // p.applyBounceWithHorizontalWall();
+                    }
+                    else{
+                        // Update sin fuerza que calcular, usamos el MRUV con la aceleración que ya tenía
+                        // p.applyUpdateNoBounce();
+                    }
+                }
             }
 
             elapsed_time += delta_t;
         }
-
-        /* Tenemos r0 de todas las particulas, v0 de todas las partículas,
-        y podemos calcular la fuerza entre dos partículas cualquiera
-         */
-
     }
 
 }

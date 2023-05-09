@@ -3,9 +3,6 @@ package IntegrationMethods;
 import System1.DampedOscillator;
 import utils.Particle;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GearPredictorCorrector implements IntegrationMethod{
     private final double delta_t;
     private final int deriv_n = 5;
@@ -48,7 +45,7 @@ public class GearPredictorCorrector implements IntegrationMethod{
         return (accel - r2) * delta_t * delta_t / 2; // 2! = 2
     }
 
-    public Double[] calculateInitialDerivs(Particle p, int n, double k){
+    public void calculateInitialDerivs(Particle p, int n, double k){
         Double[] ret = new Double[n+1];
         ret[0] = p.getX();
         ret[1] = p.getVx();
@@ -58,7 +55,6 @@ public class GearPredictorCorrector implements IntegrationMethod{
         ret[4] = km * km * p.getX();
         ret[5] = km * km * ret[1];
         derivs = ret;
-        return ret;
     }
 
     public void updateParams(Particle p){

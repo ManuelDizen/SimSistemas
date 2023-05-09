@@ -15,11 +15,11 @@ import static utils.StatisticsUtils.calculateStandardDeviation;
 public class PoolTable {
 
     private static final int MAX_COLLISIONS = 1000;
-    private static List<Particle> particles = new ArrayList<>();
+    List<Particle> particles = new ArrayList<>();
 
-    private static final double LONG_SIDE = 2.24; // m
+    final double LONG_SIDE = 2.24; // m
 
-    private static final double SHORT_SIDE = 1.12; // m
+    final double SHORT_SIDE = 1.12; // m
     private final double V = 2; // m/s
     private static final double INITIAL_X = 0.56; // m
     private static final double BALL_RADIUS = 0.0285; // m
