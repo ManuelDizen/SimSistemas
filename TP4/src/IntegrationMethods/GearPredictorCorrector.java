@@ -8,8 +8,7 @@ public class GearPredictorCorrector implements IntegrationMethod{
     private final int deriv_n = 5;
     private final Double[] gpArray = new Double[deriv_n+1];
     private final DampedOscillator oscillator = new DampedOscillator();
-    private Double[] derivsX = new Double[deriv_n + 1];
-    private Double[] derivsY = new Double[deriv_n + 1];
+    private Double[] derivs = new Double[deriv_n + 1];
 
 
     private final Double[] alphas_w_v =
@@ -47,7 +46,7 @@ public class GearPredictorCorrector implements IntegrationMethod{
         return (accel - r2) * delta_t * delta_t / 2; // 2! = 2
     }
 
-    public void calculateInitialDerivsX(Particle p, int n, double k){
+    public void calculateInitialDerivs(Particle p, int n, double k){
         Double[] ret = new Double[n+1];
         ret[0] = p.getX();
         ret[1] = p.getVx();
@@ -56,47 +55,43 @@ public class GearPredictorCorrector implements IntegrationMethod{
         ret[3] = km * ret[1];
         ret[4] = km * km * p.getX();
         ret[5] = km * km * ret[1];
-        derivsX = ret;
+        derivs = ret;
     }
 
-    //TODO: No tengo ni puta idea de como calcular las initialderiv para nuestro problema en particular
+    public Double[] calculateInitialDerivsX(Particle p, int n, double k){
+        Double[] ret = new Double[n+1];
+        ret[0] = p.getX();
+        ret[1] = p.getVx();
+        ret[2] = ret[3] = ret[4] = ret[5] = 0.0;
+        return ret;
+    }
 
-    public void calculateInitialDerivsY(Particle p, int n, double k){
+    public Double[] calculateInitialDerivsY(Particle p, int n, double k){
         Double[] ret = new Double[n+1];
         ret[0] = p.getY();
         ret[1] = p.getVy();
-        double km = -k / p.getMass();
-        ret[2] = km * p.getY();
-        ret[3] = km * ret[1];
-        ret[4] = km * km * p.getY();
-        ret[5] = km * km * ret[1];
-        derivsY = ret;
+        ret[2] = ret[3] = ret[4] = ret[5] = 0.0;
+        return ret;
     }
 
     public void updateParams(Particle p){
-        Double[] preds = makePrediction(derivsX);
+        Double[] preds = makePrediction(derivs);
         double deltaR2 = evaluateAcceleration(preds[0], preds[1], preds[2], p);
 
         correctPredictions(preds, deltaR2);
-        derivsX = preds;
+        derivs = preds;
 
         p.setX(preds[0]);
         p.setVx(preds[1]);
     }
 
-    public void updateParamsNoCol(Particle p) {
-        Double[] predsX = makePrediction(derivsX);
-        Double[] predsY = makePrediction(derivsY);
+    public Double[][] updateParamsNoCol(Double[] dX, Double[] dY) {
+        Double[] predsX = makePrediction(dX);
+        Double[] predsY = makePrediction(dY);
 
         //al no haber cambios en la aceleración, no hay que corregir
-
-        derivsX = predsX;
-        derivsY = predsY;
-
-        p.setX(predsX[0]);
-        p.setY(predsY[0]);
-        p.setVx(predsX[1]);
-        p.setVy(predsX[1]);
+        Double[][] ret = {predsX, predsY};
+        return ret;
     }
 
 

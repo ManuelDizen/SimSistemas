@@ -57,7 +57,7 @@ public class OscillatorRunnable {
 
     public static void runGear(Particle p, double k){
         GearPredictorCorrector gear = new GearPredictorCorrector(delta_t);
-        gear.calculateInitialDerivsX(p, 5, k);
+        gear.calculateInitialDerivs(p, 5, k);
         double t = 0;
         while(t < total_time){
             fileUtils.takePositionSnapshot(p, "gear", delta_t);

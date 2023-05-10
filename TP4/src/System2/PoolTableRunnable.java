@@ -6,7 +6,7 @@ public class PoolTableRunnable {
 
     public static final double k = Math.pow(10, 4);
 
-    private static final double total_time = 100;
+    private static final double total_time = 0.5;
 
     public static void main(String[] args) {
         double initial_y = Double.parseDouble(args[0]);
@@ -33,18 +33,22 @@ public class PoolTableRunnable {
         while(elapsed_time < total_time){
             for(int i = 0; i < table.particles.size(); i++){
                 Particle p = table.particles.get(i);
-                for(int j = i + 1; j < table.particles.size(); j++){
+                boolean flag = false;
+                for(int j = i + 1; j < table.particles.size(); j++) {
                     Particle q = table.particles.get(j);
-                    if(p.getNorm(q) < (p.getRadius()/2 + q.getRadius()/2)){
+                    if (p.getNorm(q) < (p.getRadius() / 2 + q.getRadius() / 2)) {
                         // p.applyUpdateWithForce(q);
+                        flag = true;
                     }
-                    else if(p.getX() >= table.LONG_SIDE || p.getX() <= 0){
+                }
+                if(!flag) {
+                    if(p.getX() >= table.LONG_SIDE || p.getX() <= 0){
                         p.applyBounceWithVerticalWall();
                     }
                     else if(p.getY() >= table.SHORT_SIDE || p.getY() <= 0){
                         p.applyBounceWithHorizontalWall();
                     }
-                    else{
+                    else {
                         // Update sin fuerza que calcular, usamos el MRUV con la aceleración que ya tenía
                         p.applyUpdateNoBounce();
                     }

@@ -35,7 +35,10 @@ public class Particle {
     public boolean PRECISION_TEST = false;
     public int scale = 3;
 
-    private static GearPredictorCorrector gear;
+    private GearPredictorCorrector gear;
+
+    private Double[] derivsX;
+    private Double[] derivsY;
 
     public Particle(double x, double y, double vx, double vy, int idx, double radius, double mass) {
         this.x = x;
@@ -52,9 +55,9 @@ public class Particle {
         this.prev_vy = 0.0;
         this.prev_ay = 0.0;
 
-        gear = new GearPredictorCorrector(PoolTableRunnable.delta_t);
-        gear.calculateInitialDerivsX(this, 5, k);
-        gear.calculateInitialDerivsY(this, 5, k);
+        gear = new GearPredictorCorrector(Math.pow(10, PoolTableRunnable.delta_t));
+        this.derivsX = gear.calculateInitialDerivsX(this, 5, k);
+        this.derivsY = gear.calculateInitialDerivsY(this, 5, k);
     }
 
     public double getPrev_x() {
@@ -181,6 +184,22 @@ public class Particle {
         return radius;
     }
 
+    public Double[] getDerivsX() {
+        return derivsX;
+    }
+
+    public Double[] getDerivsY() {
+        return derivsY;
+    }
+
+    public void setDerivsX(Double[] derivsX) {
+        this.derivsX = derivsX;
+    }
+
+    public void setDerivsY(Double[] derivsY) {
+        this.derivsY = derivsY;
+    }
+
     public double testing(double og){
         return PRECISION_TEST? BigDecimal.valueOf(og)
                 .setScale(scale, RoundingMode.HALF_UP)
@@ -292,7 +311,13 @@ public class Particle {
     }
 
     public void applyUpdateNoBounce() {
-        gear.updateParamsNoCol(this);
+        Double[][] results = gear.updateParamsNoCol(derivsX, derivsY);
+        setX(results[0][0]);
+        setY(results[1][0]);
+        setVx(results[0][1]);
+        setVy(results[1][1]);
+        setDerivsX(results[0]);
+        setDerivsY(results[1]);
     }
 
     public void applyBounceWithHorizontalWall() {
