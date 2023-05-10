@@ -30,6 +30,8 @@ public class Particle {
     private double mass;
     private int collision_n = 0;
 
+    private double[] force;
+
     public boolean PRECISION_TEST = false;
     public int scale = 3;
 
@@ -51,7 +53,8 @@ public class Particle {
         this.prev_ay = 0.0;
 
         gear = new GearPredictorCorrector(PoolTableRunnable.delta_t);
-        gear.calculateInitialDerivs(this, 5, k);
+        gear.calculateInitialDerivsX(this, 5, k);
+        gear.calculateInitialDerivsY(this, 5, k);
     }
 
     public double getPrev_x() {
@@ -235,6 +238,10 @@ public class Particle {
         this.mass = mass;
     }
 
+    public double[] getForce() {
+        return force;
+    }
+
     public void bounceWithVerticalWall(){
         this.vx = -this.vx;
         this.collision_n++;
@@ -270,7 +277,7 @@ public class Particle {
     }
 
 
-    public double[] calculateForce(Particle other){
+    public void calculateForce(Particle other){
         double norm = getNorm(other);
         double[] normal = new double[2];
         normal[0] = (other.getX() - this.getX())/norm;
@@ -281,6 +288,20 @@ public class Particle {
         toRet[0]=constant*normal[0];
         toRet[1]=constant*normal[1];
 
-        return toRet;
+        force = toRet;
+    }
+
+    public void applyUpdateNoBounce() {
+        gear.updateParamsNoCol(this);
+    }
+
+    public void applyBounceWithHorizontalWall() {
+        setVx(-this.getVx());
+    }
+
+    //TODO: Revisar el choque con pared
+
+    public void applyBounceWithVerticalWall() {
+        setVy(-this.getVy());
     }
 }

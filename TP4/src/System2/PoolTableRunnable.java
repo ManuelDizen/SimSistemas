@@ -35,18 +35,18 @@ public class PoolTableRunnable {
                 Particle p = table.particles.get(i);
                 for(int j = i + 1; j < table.particles.size(); j++){
                     Particle q = table.particles.get(j);
-                    if(p.getNorm(q) < (p.getRadius() + q.getRadius())){
+                    if(p.getNorm(q) < (p.getRadius()/2 + q.getRadius()/2)){
                         // p.applyUpdateWithForce(q);
                     }
                     else if(p.getX() >= table.LONG_SIDE || p.getX() <= 0){
-                        // p.applyBounceWithVerticalWall();
+                        p.applyBounceWithVerticalWall();
                     }
                     else if(p.getY() >= table.SHORT_SIDE || p.getY() <= 0){
-                        // p.applyBounceWithHorizontalWall();
+                        p.applyBounceWithHorizontalWall();
                     }
                     else{
                         // Update sin fuerza que calcular, usamos el MRUV con la aceleración que ya tenía
-                        // p.applyUpdateNoBounce();
+                        p.applyUpdateNoBounce();
                     }
                 }
             }
