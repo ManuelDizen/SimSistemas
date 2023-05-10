@@ -321,12 +321,18 @@ public class Particle {
     }
 
     public void applyBounceWithHorizontalWall() {
-        setVx(-this.getVx());
+        Double[] derivs = derivsY;
+        derivs[1] = -derivsY[1];
+        setDerivsY(derivs);
+        applyUpdateNoBounce();
     }
 
     //TODO: Revisar el choque con pared
 
     public void applyBounceWithVerticalWall() {
-        setVy(-this.getVy());
+        Double[] derivs = derivsX;
+        derivs[1] = -derivsX[1];
+        setDerivsX(derivs);
+        applyUpdateNoBounce();
     }
 }
