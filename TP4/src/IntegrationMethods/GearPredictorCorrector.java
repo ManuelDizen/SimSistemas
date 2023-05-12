@@ -28,13 +28,23 @@ public class GearPredictorCorrector implements IntegrationMethod{
         return n * factorial(n-1);
     }
 
-    public Double[] makePrediction(Double[] derivs){
+    public Double[] makePrediction(Double[] derivs, boolean mruv){
         Double[] ret = derivs.clone();
         double aux;
-        for(int i = 0; i < ret.length; i++){
+        int limit;
+        if(mruv)
+            limit = 3;
+        else
+            limit = ret.length;
+        for(int i = 0; i < limit; i++){
+            if(i==3) {
+                System.out.println("cálculo deriv3: ");
+            }
             aux = 0;
-            for(int j = 0; j < ret.length - i; j++) {
+            for(int j = 0; j < limit - i; j++) {
                 aux += derivs[i + j] * gpArray[j];
+                if(i==3)
+                    System.out.println(derivs[i + j] * gpArray[j] + ", aux: " + aux);
             }
             ret[i] = aux;
         }
@@ -78,7 +88,7 @@ public class GearPredictorCorrector implements IntegrationMethod{
     }
 
     public void updateParams(Particle p){
-        Double[] preds = makePrediction(derivs);
+        Double[] preds = makePrediction(derivs, false);
         double deltaR2 = evaluateAcceleration(preds[0], preds[1], preds[2], p);
 
         derivs = correctPredictions(preds, deltaR2);
@@ -87,14 +97,25 @@ public class GearPredictorCorrector implements IntegrationMethod{
         p.setVx(preds[1]);
     }
 
-    public Double[][] updateParamsNoCol(Double[] dX, Double[] dY) {
-        Double[] predsX = makePrediction(dX);
-        Double[] predsY = makePrediction(dY);
+    public Double[][] getPredictions(Double[] dX, Double[] dY) {
+        Double[] predsX = makePrediction(dX, false);
+        Double[] predsY = makePrediction(dY, false);
 
         //al no haber cambios en la aceleración, no hay que corregir
         Double[][] ret = {predsX, predsY};
         return ret;
     }
+
+    public Double[][] getPredictionsMruv(Double[] dX, Double[] dY) {
+        Double[] predsX = makePrediction(dX, true);
+        Double[] predsY = makePrediction(dY, true);
+
+        //al no haber cambios en la aceleración, no hay que corregir
+        Double[][] ret = {predsX, predsY};
+        return ret;
+    }
+
+
 
     public Double[] correctPredictions(Double[] preds, double deltaR2){
         for(int i = 0; i < preds.length; i++){

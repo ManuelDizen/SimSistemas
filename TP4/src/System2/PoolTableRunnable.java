@@ -2,11 +2,11 @@ package System2;
 import utils.Particle;
 public class PoolTableRunnable {
     private static PoolTable table;
-    public static final double delta_t = -5;
+    public static final double delta_t = -3;
 
     public static final double k = Math.pow(10, 4);
 
-    private static final double total_time = 0.1;
+    private static final double total_time = 0.5;
 
     public static void main(String[] args) {
         double initial_y = Double.parseDouble(args[0]);
@@ -33,19 +33,28 @@ public class PoolTableRunnable {
         double elapsed_time = 0;
         while(elapsed_time < total_time){
             for(int i = 0; i < table.particles.size(); i++){
+                //para cada partícula p, itero por el resto de las partículas a ver cuáles la están "influenciando"
+                //acumulo las fuerzas para sacar la fuerza neta
                 Particle p = table.particles.get(i);
-                System.out.println("Particle " + p.getIdx() + ": " + p.getX() + ", " + p.getY());
+                System.out.println("Particle " + p.getIdx() + ": " + p.getX() + ", " + p.getY() + " vel: " + p.getVx() + ", " + p.getVy() + " acc: " + p.getDerivsX()[2] + ", " + p.getDerivsY()[2]);
                 boolean flag = false;
+                Double[] forceP;
                 for(int j = i + 1; j < table.particles.size(); j++) {
                     Particle q = table.particles.get(j);
                     if (p.getNorm(p.getX(), p.getY(), q.getX(), q.getY()) < (p.getRadius() + q.getRadius())) {
                         System.out.println("COLLISION!!!!!!!!!!!!!!!");
-                        Double forceQ[] = p.applyUpdateWithForce(q.getX(), q.getY());
-                        q.setForceDeriv(forceQ);
+                        forceP = p.predictForce(q.getX(), q.getY());
+                        p.accumForce(forceP[0], forceP[1]);
+                        q.accumForce(-forceP[0], -forceP[1]);
                         flag = true;
                     }
                 }
-                if(!flag) {
+                System.out.println(p.hasAccumForce());
+                if(flag || p.hasAccumForce()) {
+                    p.applyUpdateWithForce(p.getForce());
+                    p.resetForce();
+                }
+                else {
                     if(p.getX() >= table.LONG_SIDE || p.getX() <= 0){
                         System.out.println("vertical wall ");
                         p.applyBounceWithVerticalWall();

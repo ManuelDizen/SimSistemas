@@ -54,6 +54,7 @@ public class Particle {
         this.prev_y = 0.0;
         this.prev_vy = 0.0;
         this.prev_ay = 0.0;
+        this.force = new Double[]{0.0, 0.0};
 
         gear = new GearPredictorCorrector(Math.pow(10, PoolTableRunnable.delta_t));
         this.derivsX = gear.calculateInitialDerivsX(this, 5, k);
@@ -297,7 +298,7 @@ public class Particle {
     }
 
 
-    public void calculateForce(double X, double Y, double otherX, double otherY){
+    public Double[] calculateForce(double X, double Y, double otherX, double otherY){
         //System.out.println("in calculate force: " + otherX + ", " + otherY);
         double norm = getNorm(X, Y, otherX, otherY);
         //System.out.println("norm: " + norm);
@@ -314,38 +315,67 @@ public class Particle {
         toRet[0]=constant*normal[0];
         toRet[1]=constant*normal[1];
 
-        force = toRet;
+        return toRet;
     }
 
     public Double[][] getPredictions() {
-        return gear.updateParamsNoCol(derivsX, derivsY);
+        return gear.getPredictions(derivsX, derivsY);
+    }
+
+    public Double[][] getPredictionsMruv() {
+        return gear.getPredictionsMruv(derivsX, derivsY);
     }
 
     public void applyUpdateNoBounce() {
-        Double[][] results = getPredictions();
-        setX(results[0][0]);
-        setY(results[1][0]);
-        setVx(results[0][1]);
-        setVy(results[1][1]);
-        setDerivsX(results[0]);
-        setDerivsY(results[1]);
+        System.out.println("acceleration: " + derivsX[2] + " ," + derivsY[2]);
+        Double[][] results = getPredictionsMruv();
+        derivsX[0] = results[0][0];
+        derivsY[0] = results[1][0];
+        derivsX[1] = results[0][1];
+        derivsY[1] = results[1][1];
+        setParameters();
     }
 
-    public Double[] applyUpdateWithForce(double otherX, double otherY) {
+    public boolean hasAccumForce() {
+        return ((getForce()[0] != 0) || (getForce()[1] != 0));
+    }
+
+    public Double[] predictForce(double otherX, double otherY) {
+        Double[][] preds = getPredictions();
+        return calculateForce(preds[0][0], preds[1][0], otherX, otherY);
+    }
+
+    public void accumForce(double forceX, double forceY) {
+        setForce(new Double[]{forceX + getForce()[0], forceY + getForce()[1]});
+    }
+
+    public void setForce(Double[] force) {
+        this.force = force;
+    }
+
+    public void resetForce() {
+        setForce(new Double[]{0.0, 0.0});
+    }
+    public void applyUpdateWithForce(Double[] f) {
         System.out.println("in apply update with force particle " + getIdx());
         Double[][] preds = getPredictions();
-        System.out.println("preds: " + preds[0][0] + " " + preds[1][0] + " " + preds[0][1] + " " + preds[1][1] );
-        calculateForce(preds[0][0], preds[1][0], otherX, otherY);
-        Double[] acceleration = {force[0]/getMass(), force[1]/getMass()};
+        Double[] acceleration = {f[0]/getMass(), f[1]/getMass()};
         System.out.println("acceleration: " + acceleration[0] + " " + acceleration[1]);
         Double[] deltaR2 = {gear.calculateDeltaR2(acceleration[0], preds[0][2]), gear.calculateDeltaR2(acceleration[1], preds[1][2])};
+        System.out.println("delta2" + deltaR2[0] + " " + deltaR2[1]);
         setDerivsX(gear.correctPredictions(preds[0], deltaR2[0]));
         setDerivsY(gear.correctPredictions(preds[1], deltaR2[1]));
+        for(int i=0; i<6; i++) {
+            System.out.println("derivs: " + derivsX[i] + " " + derivsY[i]);
+        }
+        setParameters();
+    }
+
+    private void setParameters() {
         setX(derivsX[0]);
-        setY(derivsY[1]);
-        setVx(derivsX[0]);
+        setY(derivsY[0]);
+        setVx(derivsX[1]);
         setVy(derivsY[1]);
-        return new Double[]{-force[0], -force[1]};
     }
 
     public void setForceDeriv(Double[] force) {
