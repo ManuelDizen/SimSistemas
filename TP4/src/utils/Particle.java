@@ -185,21 +185,6 @@ public class Particle {
         return radius;
     }
 
-    public Double[] getDerivsX() {
-        return derivsX;
-    }
-
-    public Double[] getDerivsY() {
-        return derivsY;
-    }
-
-    public void setDerivsX(Double[] derivsX) {
-        this.derivsX = derivsX;
-    }
-
-    public void setDerivsY(Double[] derivsY) {
-        this.derivsY = derivsY;
-    }
 
     public double testing(double og){
         return PRECISION_TEST? BigDecimal.valueOf(og)
@@ -258,10 +243,6 @@ public class Particle {
         this.mass = mass;
     }
 
-    public Double[] getForce() {
-        return force;
-    }
-
     public void bounceWithVerticalWall(){
         this.vx = -this.vx;
         this.collision_n++;
@@ -290,85 +271,64 @@ public class Particle {
         this.collision_n++;
     }
 
+    /*-----------------------------------------FUNCIONES TP4-----------------------------------------------*/
+
+    public void setDerivsX(Double[] derivsX) {
+        this.derivsX = derivsX;
+    }
+
+    public void setDerivsY(Double[] derivsY) {
+        this.derivsY = derivsY;
+    }
     public double getNorm(double X, double Y, double otherX, double otherY){
-        //System.out.println("en get norm con " + X + " " + Y + " " + otherX + " " + otherY);
         return Math.sqrt(Math.pow(otherX - X, 2) + Math.pow(otherY - Y, 2));
-        //TODO: chequear si esto está bien vengo para atrás con geometría
-        // Escribi esto: √((xj - xi)^2 + (yj - yi)^2)
     }
 
 
-    public Double[] calculateForce(double X, double Y, double otherX, double otherY){
-        //System.out.println("in calculate force: " + otherX + ", " + otherY);
+    private Double[] calculateForce(double X, double Y, double otherX, double otherY){
+
         double norm = getNorm(X, Y, otherX, otherY);
-        //System.out.println("norm: " + norm);
+
         double[] normal = new double[2];
         normal[0] = (otherX - X)/norm;
         normal[1] = (otherY - Y)/norm;
 
         Double[] toRet = new Double[2];
-        double rad = this.radius*2;
-        //System.out.println("rad: " + rad);
-        //System.out.println("k: " + k);
         double constant = k * (norm - (this.radius*2));
-        //System.out.println("constant: " + constant);
+
         toRet[0]=constant*normal[0];
         toRet[1]=constant*normal[1];
 
         return toRet;
     }
 
-    public Double[][] getPredictions() {
+    private Double[][] getPredictions() { //tomo las predictions del gear sin que impacten en el estado del sistema
         return gear.getPredictions(derivsX, derivsY);
     }
 
-    public Double[][] getPredictionsMruv() {
-        return gear.getPredictionsMruv(derivsX, derivsY);
-    }
-
-    public void applyUpdateNoBounce() {
-        System.out.println("acceleration: " + derivsX[2] + " ," + derivsY[2]);
-        Double[][] results = getPredictionsMruv();
-        derivsX[0] = results[0][0];
-        derivsY[0] = results[1][0];
-        derivsX[1] = results[0][1];
-        derivsY[1] = results[1][1];
-        setParameters();
-    }
-
-    public boolean hasAccumForce() {
-        return ((getForce()[0] != 0) || (getForce()[1] != 0));
-    }
-
+    //calculo fuerza en función de variables predichas
     public Double[] predictForce(double otherX, double otherY) {
         Double[][] preds = getPredictions();
         return calculateForce(preds[0][0], preds[1][0], otherX, otherY);
     }
 
-    public void accumForce(double forceX, double forceY) {
-        setForce(new Double[]{forceX + getForce()[0], forceY + getForce()[1]});
+    public Double[] getForce() {
+        return force;
     }
 
-    public void setForce(Double[] force) {
+    private void setForce(Double[] force) {
         this.force = force;
     }
 
-    public void resetForce() {
+    public void resetForce() { //resetear fuerza a 0
         setForce(new Double[]{0.0, 0.0});
     }
-    public void applyUpdateWithForce(Double[] f) {
-        System.out.println("in apply update with force particle " + getIdx());
-        Double[][] preds = getPredictions();
-        Double[] acceleration = {f[0]/getMass(), f[1]/getMass()};
-        System.out.println("acceleration: " + acceleration[0] + " " + acceleration[1]);
-        Double[] deltaR2 = {gear.calculateDeltaR2(acceleration[0], preds[0][2]), gear.calculateDeltaR2(acceleration[1], preds[1][2])};
-        System.out.println("delta2" + deltaR2[0] + " " + deltaR2[1]);
-        setDerivsX(gear.correctPredictions(preds[0], deltaR2[0]));
-        setDerivsY(gear.correctPredictions(preds[1], deltaR2[1]));
-        for(int i=0; i<6; i++) {
-            System.out.println("derivs: " + derivsX[i] + " " + derivsY[i]);
-        }
-        setParameters();
+    public boolean hasAccumForce() {
+        return ((getForce()[0] != 0) || (getForce()[1] != 0));
+    }
+
+    public void accumForce(double forceX, double forceY) {
+        setForce(new Double[]{forceX + getForce()[0], forceY + getForce()[1]});
     }
 
     private void setParameters() {
@@ -378,16 +338,20 @@ public class Particle {
         setVy(derivsY[1]);
     }
 
-    public void setForceDeriv(Double[] force) {
-        derivsX[2] = force[0]/getMass();
-        derivsY[2] = force[1]/getMass();
+    public void applyUpdate(Double[] f) {
+        Double[][] preds = getPredictions(); //tomo predicciones del gear
+        Double[] acceleration = {f[0]/getMass(), f[1]/getMass()}; //aceleración calculada con fórmula
+        Double[] deltaR2 = {gear.calculateDeltaR2(acceleration[0], preds[0][2]), gear.calculateDeltaR2(acceleration[1], preds[1][2])};
+        setDerivsX(gear.correctPredictions(preds[0], deltaR2[0])); //corrijo y seteo las derivs para la próxima iteración
+        setDerivsY(gear.correctPredictions(preds[1], deltaR2[1]));
+        setParameters();
     }
 
     public void applyBounceWithHorizontalWall() {
         Double[] derivs = derivsY;
         derivs[1] = -derivsY[1];
         setDerivsY(derivs);
-        applyUpdateNoBounce();
+        applyUpdate(new Double[]{0.0, 0.0});
     }
 
     //TODO: Revisar el choque con pared
@@ -396,6 +360,6 @@ public class Particle {
         Double[] derivs = derivsX;
         derivs[1] = -derivsX[1];
         setDerivsX(derivs);
-        applyUpdateNoBounce();
+        applyUpdate(new Double[]{0.0, 0.0});
     }
 }

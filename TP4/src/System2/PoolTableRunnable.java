@@ -6,7 +6,7 @@ public class PoolTableRunnable {
 
     public static final double k = Math.pow(10, 4);
 
-    private static final double total_time = 0.5;
+    private static final double total_time = 1;
 
     public static void main(String[] args) {
         double initial_y = Double.parseDouble(args[0]);
@@ -28,33 +28,32 @@ public class PoolTableRunnable {
     }
 
     public static void runWithoutBuchacas(double delta_t){
-        //table.generateParticlesNoBuchacas();
-        table.generateSix();
+        table.generateParticlesNoBuchacas();
         double elapsed_time = 0;
         while(elapsed_time < total_time){
             for(int i = 0; i < table.particles.size(); i++){
-                //para cada partícula p, itero por el resto de las partículas a ver cuáles la están "influenciando"
-                //acumulo las fuerzas para sacar la fuerza neta
                 Particle p = table.particles.get(i);
-                System.out.println("Particle " + p.getIdx() + ": " + p.getX() + ", " + p.getY() + " vel: " + p.getVx() + ", " + p.getVy() + " acc: " + p.getDerivsX()[2] + ", " + p.getDerivsY()[2]);
+                //System.out.println("Particle " + p.getIdx() + ": " + p.getX() + ", " + p.getY() + " vel: " + p.getVx() + ", " + p.getVy() + " acc: " + p.getDerivsX()[2] + ", " + p.getDerivsY()[2]);
                 boolean flag = false;
                 Double[] forceP;
+                /*para cada partícula p, itero por el resto de las partículas a ver cuáles la están "influenciando"
+                acumulo las fuerzas para sacar la fuerza neta*/
                 for(int j = i + 1; j < table.particles.size(); j++) {
                     Particle q = table.particles.get(j);
                     if (p.getNorm(p.getX(), p.getY(), q.getX(), q.getY()) < (p.getRadius() + q.getRadius())) {
-                        System.out.println("COLLISION!!!!!!!!!!!!!!!");
+                        //si se influencian, calculo la fuerza entre ellas
                         forceP = p.predictForce(q.getX(), q.getY());
+                        //cada bocha tiene que guardar y "acumular" la fuerza de esta interacción
                         p.accumForce(forceP[0], forceP[1]);
                         q.accumForce(-forceP[0], -forceP[1]);
                         flag = true;
                     }
                 }
-                System.out.println(p.hasAccumForce());
-                if(flag || p.hasAccumForce()) {
-                    p.applyUpdateWithForce(p.getForce());
-                    p.resetForce();
+                if(flag || p.hasAccumForce()) { //si al salir del for hubo al menos una colisión, entonces hay fuerza neta
+                    p.applyUpdate(p.getForce());
+                    p.resetForce(); //vuelvo la fuerza a 0 para empezar a acumular de 0 en la próxima iteración
                 }
-                else {
+                else { //si no hubo choque con otra bocha, entro acá
                     if(p.getX() >= table.LONG_SIDE || p.getX() <= 0){
                         System.out.println("vertical wall ");
                         p.applyBounceWithVerticalWall();
@@ -64,8 +63,8 @@ public class PoolTableRunnable {
                         p.applyBounceWithHorizontalWall();
                     }
                     else {
-                        // Update sin fuerza que calcular, usamos el MRUV con la aceleración que ya tenía
-                        p.applyUpdateNoBounce();
+                        // al no haber colisión, hago update con fuerza 0
+                        p.applyUpdate(new Double[]{0.0, 0.0});
                     }
                 }
             }

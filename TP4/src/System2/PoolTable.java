@@ -51,7 +51,14 @@ public class PoolTable {
         double initial_triangle_y = SHORT_SIDE / 2;
 
         //primera bola
-        particles.add(new Particle(0.80, initial_triangle_y, 0, 0, 7, BALL_RADIUS, MASS));
+        particles.add(new Particle(initial_triangle_x, initial_triangle_y, 0, 0, 7, BALL_RADIUS, MASS));
+
+        double epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + BALL_RADIUS * 2 + epsilon,
+                initial_triangle_y + BALL_RADIUS + epsilon, 0, 0, 8, BALL_RADIUS, MASS));
+        epsilon = epsilon();
+        particles.add(new Particle(initial_triangle_x + BALL_RADIUS * 2 + epsilon,
+                initial_triangle_y - BALL_RADIUS - epsilon, 0, 0, 9, BALL_RADIUS, MASS));
     }
 
     public void generateParticlesNoBuchacas(){
