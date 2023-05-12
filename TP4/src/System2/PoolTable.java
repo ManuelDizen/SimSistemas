@@ -45,6 +45,15 @@ public class PoolTable {
         return (MAX_EPSILON - Math.random() * 0.0001) / Math.sqrt(2);
     }
 
+    public void generateSix() {
+        particles.add(new Particle(INITIAL_X, initial_y, V, 0, 6, BALL_RADIUS, MASS)); //cambiar ángulo
+        double initial_triangle_x = LONG_SIDE - 0.56;
+        double initial_triangle_y = SHORT_SIDE / 2;
+
+        //primera bola
+        particles.add(new Particle(0.80, initial_triangle_y, 0, 0, 7, BALL_RADIUS, MASS));
+    }
+
     public void generateParticlesNoBuchacas(){
         //bola blanca
         particles.add(new Particle(INITIAL_X, initial_y, V, 0, 6, BALL_RADIUS, MASS)); //cambiar ángulo

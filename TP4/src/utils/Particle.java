@@ -30,7 +30,7 @@ public class Particle {
     private double mass;
     private int collision_n = 0;
 
-    private double[] force;
+    private Double[] force;
 
     public boolean PRECISION_TEST = false;
     public int scale = 3;
@@ -257,7 +257,7 @@ public class Particle {
         this.mass = mass;
     }
 
-    public double[] getForce() {
+    public Double[] getForce() {
         return force;
     }
 
@@ -289,35 +289,68 @@ public class Particle {
         this.collision_n++;
     }
 
-    public double getNorm(Particle other){
-        return Math.sqrt(Math.pow(other.getX() - this.getX(), 2) + Math.pow(other.getY() - this.getY(), 2));
+    public double getNorm(double X, double Y, double otherX, double otherY){
+        //System.out.println("en get norm con " + X + " " + Y + " " + otherX + " " + otherY);
+        return Math.sqrt(Math.pow(otherX - X, 2) + Math.pow(otherY - Y, 2));
         //TODO: chequear si esto está bien vengo para atrás con geometría
         // Escribi esto: √((xj - xi)^2 + (yj - yi)^2)
     }
 
 
-    public void calculateForce(Particle other){
-        double norm = getNorm(other);
+    public void calculateForce(double X, double Y, double otherX, double otherY){
+        //System.out.println("in calculate force: " + otherX + ", " + otherY);
+        double norm = getNorm(X, Y, otherX, otherY);
+        //System.out.println("norm: " + norm);
         double[] normal = new double[2];
-        normal[0] = (other.getX() - this.getX())/norm;
-        normal[1] = (other.getY() - this.getY())/norm;
+        normal[0] = (otherX - X)/norm;
+        normal[1] = (otherY - Y)/norm;
 
-        double[] toRet = new double[2];
-        double constant = k * (norm - (this.radius + other.radius));
+        Double[] toRet = new Double[2];
+        double rad = this.radius*2;
+        //System.out.println("rad: " + rad);
+        //System.out.println("k: " + k);
+        double constant = k * (norm - (this.radius*2));
+        //System.out.println("constant: " + constant);
         toRet[0]=constant*normal[0];
         toRet[1]=constant*normal[1];
 
         force = toRet;
     }
 
+    public Double[][] getPredictions() {
+        return gear.updateParamsNoCol(derivsX, derivsY);
+    }
+
     public void applyUpdateNoBounce() {
-        Double[][] results = gear.updateParamsNoCol(derivsX, derivsY);
+        Double[][] results = getPredictions();
         setX(results[0][0]);
         setY(results[1][0]);
         setVx(results[0][1]);
         setVy(results[1][1]);
         setDerivsX(results[0]);
         setDerivsY(results[1]);
+    }
+
+    public Double[] applyUpdateWithForce(double otherX, double otherY) {
+        System.out.println("in apply update with force particle " + getIdx());
+        Double[][] preds = getPredictions();
+        System.out.println("preds: " + preds[0][0] + " " + preds[1][0] + " " + preds[0][1] + " " + preds[1][1] );
+        calculateForce(preds[0][0], preds[1][0], otherX, otherY);
+        Double[] acceleration = {force[0]/getMass(), force[1]/getMass()};
+        System.out.println("acceleration: " + acceleration[0] + " " + acceleration[1]);
+        Double[] deltaR2 = {gear.calculateDeltaR2(acceleration[0], preds[0][2]), gear.calculateDeltaR2(acceleration[1], preds[1][2])};
+        setDerivsX(gear.correctPredictions(preds[0], deltaR2[0]));
+        setDerivsY(gear.correctPredictions(preds[1], deltaR2[1]));
+        setX(derivsX[0]);
+        setY(derivsY[1]);
+        setVx(derivsX[0]);
+        setVy(derivsY[1]);
+        return new Double[]{-force[0], -force[1]};
+    }
+
+    public void setForceDeriv(Double[] force) {
+        derivsX[2] = force[0]/getMass();
+        derivsY[2] = force[1]/getMass();
     }
 
     public void applyBounceWithHorizontalWall() {

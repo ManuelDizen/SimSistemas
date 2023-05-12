@@ -43,9 +43,12 @@ public class GearPredictorCorrector implements IntegrationMethod{
 
     public Double evaluateAcceleration(Double r0, Double r1, Double r2, Particle p){
         double accel = oscillator.calculateForce(r0, r1) / p.getMass();
-        return (accel - r2) * delta_t * delta_t / 2; // 2! = 2
+        return calculateDeltaR2(accel, r2);
     }
 
+    public Double calculateDeltaR2(double accel, double r2) {
+        return (accel - r2) * delta_t * delta_t / 2; // 2! = 2
+    }
     public void calculateInitialDerivs(Particle p, int n, double k){
         Double[] ret = new Double[n+1];
         ret[0] = p.getX();
@@ -78,8 +81,7 @@ public class GearPredictorCorrector implements IntegrationMethod{
         Double[] preds = makePrediction(derivs);
         double deltaR2 = evaluateAcceleration(preds[0], preds[1], preds[2], p);
 
-        correctPredictions(preds, deltaR2);
-        derivs = preds;
+        derivs = correctPredictions(preds, deltaR2);
 
         p.setX(preds[0]);
         p.setVx(preds[1]);
@@ -94,11 +96,11 @@ public class GearPredictorCorrector implements IntegrationMethod{
         return ret;
     }
 
-
-    private void correctPredictions(Double[] preds, double deltaR2){
+    public Double[] correctPredictions(Double[] preds, double deltaR2){
         for(int i = 0; i < preds.length; i++){
             preds[i] += alphas_w_v[i] * deltaR2 * factorial(i) / Math.pow(delta_t, i);
         }
+        return preds;
     }
 
 }

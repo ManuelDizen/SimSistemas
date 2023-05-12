@@ -2,11 +2,11 @@ package System2;
 import utils.Particle;
 public class PoolTableRunnable {
     private static PoolTable table;
-    public static final double delta_t = -2;
+    public static final double delta_t = -5;
 
     public static final double k = Math.pow(10, 4);
 
-    private static final double total_time = 0.5;
+    private static final double total_time = 0.1;
 
     public static void main(String[] args) {
         double initial_y = Double.parseDouble(args[0]);
@@ -28,24 +28,30 @@ public class PoolTableRunnable {
     }
 
     public static void runWithoutBuchacas(double delta_t){
-        table.generateParticlesNoBuchacas();
+        //table.generateParticlesNoBuchacas();
+        table.generateSix();
         double elapsed_time = 0;
         while(elapsed_time < total_time){
             for(int i = 0; i < table.particles.size(); i++){
                 Particle p = table.particles.get(i);
+                System.out.println("Particle " + p.getIdx() + ": " + p.getX() + ", " + p.getY());
                 boolean flag = false;
                 for(int j = i + 1; j < table.particles.size(); j++) {
                     Particle q = table.particles.get(j);
-                    if (p.getNorm(q) < (p.getRadius() / 2 + q.getRadius() / 2)) {
-                        // p.applyUpdateWithForce(q);
+                    if (p.getNorm(p.getX(), p.getY(), q.getX(), q.getY()) < (p.getRadius() + q.getRadius())) {
+                        System.out.println("COLLISION!!!!!!!!!!!!!!!");
+                        Double forceQ[] = p.applyUpdateWithForce(q.getX(), q.getY());
+                        q.setForceDeriv(forceQ);
                         flag = true;
                     }
                 }
                 if(!flag) {
                     if(p.getX() >= table.LONG_SIDE || p.getX() <= 0){
+                        System.out.println("vertical wall ");
                         p.applyBounceWithVerticalWall();
                     }
                     else if(p.getY() >= table.SHORT_SIDE || p.getY() <= 0){
+                        System.out.println("horizontal wall ");
                         p.applyBounceWithHorizontalWall();
                     }
                     else {
