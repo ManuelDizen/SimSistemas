@@ -95,6 +95,7 @@ scatter(file, file2, file3, 0.0001, 5.0000)
 
 idx = idx + 1
 
+print("\n1E-5\n--------------------")
 file = open("../output/beeman1.0E-5.txt")
 file2 = open("../output/verlet1.0E-5.txt")
 file3 = open("../output/gear1.0E-5.txt")

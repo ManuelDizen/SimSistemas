@@ -131,15 +131,17 @@ public class PoolTableRunnable {
         table.generateParticles();
         double elapsed_time = 0;
         int ctr = 0;
-        double block_time = 1.0;
+        double block_time = 0.001;
         try (FileWriter output = new FileWriter(
                 String.format("output_delta_t=%f.txt", delta_t))) {
+            FileUtils.takeSystemSnapshot(output, table.particles, ctr);
             while (table.particles.size() > 14) { //Tenemos 22, si salen la mitad quedarían 22-(16/2)=14
                 progressDeltaTBuchacas(table);
-                if (elapsed_time + delta_t > ctr * block_time) {
+                /*if (elapsed_time + delta_t > ctr * block_time) {
                     FileUtils.takeSystemSnapshot(output, table.particles, ctr);
                     ctr++;
-                }
+                }*/
+                FileUtils.takeSystemSnapshot(output, table.particles, ctr);
                 elapsed_time += Math.pow(10, delta_t);
             }
         }
