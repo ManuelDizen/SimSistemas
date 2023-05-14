@@ -17,9 +17,9 @@ public class PoolTable {
     private static final int MAX_COLLISIONS = 1000;
     List<Particle> particles = new ArrayList<>();
 
-    final double LONG_SIDE = 2.24; // m
+    public static final double LONG_SIDE = 2.24; // m
 
-    final double SHORT_SIDE = 1.12; // m
+    public static final double SHORT_SIDE = 1.12; // m
     private final double V = 2; // m/s
     private static final double INITIAL_X = 0.56; // m
     private static final double BALL_RADIUS = 0.0285; // m

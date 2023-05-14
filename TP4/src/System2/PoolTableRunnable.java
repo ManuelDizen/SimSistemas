@@ -81,7 +81,7 @@ public class PoolTableRunnable {
             }
             elapsed_time += Math.pow(10,t1.getDeltaT());
         }
-        System.out.println(String.format("Phi entre %d y %d: ", (int)t1.getDeltaT(), (int)t1.getDeltaT()-1));
+        System.out.println(String.format("Phi entre %d y %d: ", (int)t1.getDeltaT(), (int)t2.getDeltaT()));
         System.out.println(phi);
 
     }
@@ -134,14 +134,14 @@ public class PoolTableRunnable {
         double block_time = 0.001;
         try (FileWriter output = new FileWriter(
                 String.format("output_delta_t=%f.txt", delta_t))) {
-            FileUtils.takeSystemSnapshot(output, table.particles, ctr);
+            FileUtils.takeSystemSnapshot(output, table.particles, ctr++);
             while (table.particles.size() > 14) { //Tenemos 22, si salen la mitad quedarían 22-(16/2)=14
                 progressDeltaTBuchacas(table);
                 /*if (elapsed_time + delta_t > ctr * block_time) {
                     FileUtils.takeSystemSnapshot(output, table.particles, ctr);
                     ctr++;
                 }*/
-                FileUtils.takeSystemSnapshot(output, table.particles, ctr);
+                FileUtils.takeSystemSnapshot(output, table.particles, ctr++);
                 elapsed_time += Math.pow(10, delta_t);
             }
         }
@@ -194,11 +194,11 @@ public class PoolTableRunnable {
                 p.resetForce(); //vuelvo la fuerza a 0 para empezar a acumular de 0 en la próxima iteración
             }
             else { //si no hubo choque con otra bocha, entro acá
-                if(p.getX() >= t.LONG_SIDE || p.getX() <= 0){
-                    p.applyBounceWithVerticalWall();
+                if(p.getX() + p.getRadius() >= PoolTable.LONG_SIDE || p.getX() - p.getRadius() <= 0){
+                    p.applyBounceWithVerticalWall2();
                 }
-                else if(p.getY() >= t.SHORT_SIDE || p.getY() <= 0){
-                    p.applyBounceWithHorizontalWall();
+                else if(p.getY() + p.getRadius() >= PoolTable.SHORT_SIDE || p.getY() - p.getRadius() <= 0){
+                    p.applyBounceWithHorizontalWall2();
                 }
                 else {
                     // al no haber colisión, hago update con fuerza 0

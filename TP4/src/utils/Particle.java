@@ -1,6 +1,7 @@
 package utils;
 
 import IntegrationMethods.GearPredictorCorrector;
+import System2.PoolTable;
 import System2.PoolTableRunnable;
 
 import java.math.BigDecimal;
@@ -362,4 +363,33 @@ public class Particle {
         setDerivsX(derivs);
         applyUpdate(new Double[]{0.0, 0.0});
     }
+
+    public void applyBounceWithVerticalWall2(){
+        boolean right = this.getX() + this.getRadius() >= System2.PoolTable.LONG_SIDE;
+        double springConstant = 100;
+        double dist;
+        if(right){
+            dist = Math.abs(this.getX() + this.getRadius() - PoolTable.LONG_SIDE);
+        }
+        else{
+            dist = Math.abs(this.getX() - this.getRadius() - 0);
+        }
+        double force = springConstant*dist*(right?-1:1);
+        applyUpdate(new Double[]{force, 0.0});
+    }
+
+    public void applyBounceWithHorizontalWall2(){
+        boolean upper = this.getY() + this.getRadius() >= System2.PoolTable.SHORT_SIDE;
+        double springConstant = 1000;
+        double dist;
+        if(upper){
+            dist = Math.abs(this.getY() + this.getRadius() - PoolTable.SHORT_SIDE);
+        }
+        else{
+            dist = Math.abs(this.getY() - this.getRadius() - 0);
+        }
+        double force = springConstant*dist*(upper?-1:1);
+        applyUpdate(new Double[]{0.0, force});
+    }
+
 }

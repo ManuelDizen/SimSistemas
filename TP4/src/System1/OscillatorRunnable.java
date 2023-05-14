@@ -28,43 +28,59 @@ public class OscillatorRunnable {
                     0, 1, 1, mass);
             Particle p2 = new Particle(1, 0, initial_vx,
                     0, 1, 1, mass);
-            runBeeman(p1);
-            runVerlet(p2);
+            runBeeman(p1, osc.getK());
+            runVerlet(p2, osc.getK());
             Particle p3 = new Particle(1, 0, initial_vx,
                     0, 1, 1, mass);
             runGear(p3, osc.getK());
         }
     }
 
-    public static void runBeeman(Particle p){
+    public static void runBeeman(Particle p, double k){
         Beeman beeman = new Beeman(delta_t);
+        p.setAx( ( (-k * p.getX()) - (osc.getGamma() * p.getVx() ) ) / p.getMass());
         double t = 0;
+        int ctr = 0;
+        double MSE = 0;
         while(t < total_time){
+            MSE += calculateSqDiff(p.getX(), getActualVal(t));
             fileUtils.takePositionSnapshot(p, "beeman", delta_t);
             beeman.updateParams(p);
             t += delta_t;
+            ctr++;
         }
+        System.out.println(String.format("MSE con delta_t %e, método beeman: %e", delta_t, MSE/ctr));
     }
 
-    public static void runVerlet(Particle p){
+    public static void runVerlet(Particle p, double k){
         VerletOriginal verlet = new VerletOriginal(delta_t, p.getX(), p.getVx(), p.getMass());
+        p.setAx( ( (-k * p.getX()) - (osc.getGamma() * p.getVx() ) ) / p.getMass());
         double t = 0;
+        int ctr = 0;
+        double MSE = 0;
         while (t < total_time) {
+            MSE += calculateSqDiff(p.getX(), getActualVal(t));
             fileUtils.takePositionSnapshot(p, "verlet", delta_t);
             verlet.updateParams(p);
             t += delta_t;
+            ctr++;
         }
+        System.out.println(String.format("MSE con delta_t %e, método verlet: %e", delta_t, MSE/ctr));
     }
 
     public static void runGear(Particle p, double k){
-        System.out.println("Entro con delta_T=" + delta_t);
         /*GearPredictorCorrector gear = new GearPredictorCorrector(delta_t);
         gear.calculateInitialDerivs(p, 5, k);
+        p.setAx( ( (-k * p.getX()) - (osc.getGamma() * p.getVx() ) ) / p.getMass());
         double t = 0;
+        int ctr = 0;
+        double MSE = 0;
         while(t < total_time){
+            MSE += calculateSqDiff(p.getX(), getActualVal(t));
             fileUtils.takePositionSnapshot(p, "gear", delta_t);
             gear.updateParams(p);
             t += delta_t;
+            ctr++;
         }*/
         p.setAx( ( (-k * p.getX()) - (osc.getGamma() * p.getVx() ) ) / p.getMass());
         GPC2 gear = new GPC2(p, delta_t);
