@@ -89,7 +89,6 @@ public class PoolTableRunnable {
     public static void progressDeltaT(PoolTable t){
         for(int i = 0; i < t.particles.size(); i++){
             Particle p = t.particles.get(i);
-            boolean flag = false;
             Double[] forceP;
                 /*para cada partícula p, itero por el resto de las partículas a ver cuáles la están "influenciando"
                 acumulo las fuerzas para sacar la fuerza neta*/
@@ -99,26 +98,23 @@ public class PoolTableRunnable {
                     //si se influencian, calculo la fuerza entre ellas
                     forceP = p.predictForce(q.getX(), q.getY());
                     //cada bocha tiene que guardar y "acumular" la fuerza de esta interacción
-                    p.accumForce(forceP[0], forceP[1]);
-                    q.accumForce(-forceP[0], -forceP[1]);
-                    flag = true;
+                    p.accumForce(forceP);
+                    q.accumForce(new Double[]{-forceP[0], -forceP[1]});
                 }
             }
-            if(flag || p.hasAccumForce()) { //si al salir del for hubo al menos una colisión, entonces hay fuerza neta
+            if(p.getX() >= t.LONG_SIDE || p.getX() <= 0){
+                p.accumForce(p.applyBounceWithVerticalWall2());
+            }
+            else if(p.getY() >= t.SHORT_SIDE || p.getY() <= 0){
+                p.accumForce(p.applyBounceWithHorizontalWall2());
+            }
+            if(p.hasAccumForce()) { //si al salir del for hubo al menos una colisión, entonces hay fuerza neta
                 p.applyUpdate(p.getForce());
                 p.resetForce(); //vuelvo la fuerza a 0 para empezar a acumular de 0 en la próxima iteración
             }
-            else { //si no hubo choque con otra bocha, entro acá
-                if(p.getX() >= t.LONG_SIDE || p.getX() <= 0){
-                    p.applyBounceWithVerticalWall();
-                }
-                else if(p.getY() >= t.SHORT_SIDE || p.getY() <= 0){
-                    p.applyBounceWithHorizontalWall();
-                }
-                else {
-                    // al no haber colisión, hago update con fuerza 0
-                    p.applyUpdate(new Double[]{0.0, 0.0});
-                }
+            else {
+                // al no haber colisión, hago update con fuerza 0
+                p.applyUpdate(new Double[]{0.0, 0.0});
             }
         }
     }
@@ -184,26 +180,24 @@ public class PoolTableRunnable {
                     //si se influencian, calculo la fuerza entre ellas
                     forceP = p.predictForce(q.getX(), q.getY());
                     //cada bocha tiene que guardar y "acumular" la fuerza de esta interacción
-                    p.accumForce(forceP[0], forceP[1]);
-                    q.accumForce(-forceP[0], -forceP[1]);
+                    p.accumForce(forceP);
+                    q.accumForce(new Double[]{-forceP[0], -forceP[1]});
                     flag = true;
                 }
+            }
+            if(p.getX() + p.getRadius() >= PoolTable.LONG_SIDE || p.getX() - p.getRadius() <= 0){
+                p.accumForce(p.applyBounceWithVerticalWall2());
+            }
+            else if(p.getY() + p.getRadius() >= PoolTable.SHORT_SIDE || p.getY() - p.getRadius() <= 0){
+                p.accumForce(p.applyBounceWithHorizontalWall2());
             }
             if(flag || p.hasAccumForce()) { //si al salir del for hubo al menos una colisión, entonces hay fuerza neta
                 p.applyUpdate(p.getForce());
                 p.resetForce(); //vuelvo la fuerza a 0 para empezar a acumular de 0 en la próxima iteración
             }
-            else { //si no hubo choque con otra bocha, entro acá
-                if(p.getX() + p.getRadius() >= PoolTable.LONG_SIDE || p.getX() - p.getRadius() <= 0){
-                    p.applyBounceWithVerticalWall2();
-                }
-                else if(p.getY() + p.getRadius() >= PoolTable.SHORT_SIDE || p.getY() - p.getRadius() <= 0){
-                    p.applyBounceWithHorizontalWall2();
-                }
-                else {
-                    // al no haber colisión, hago update con fuerza 0
-                    p.applyUpdate(new Double[]{0.0, 0.0});
-                }
+            else {
+                // al no haber colisión, hago update con fuerza 0
+                p.applyUpdate(new Double[]{0.0, 0.0});
             }
         }
     }
