@@ -156,8 +156,8 @@ public class PoolTableRunnable {
         }
     }
 
-    private static boolean inContact(Particle p, Particle q){
-        return p.getNorm(p.getX(), p.getY(), q.getX(), q.getY()) < (p.getRadius() + q.getRadius());
+    private static boolean colliding(Particle p, Particle q){
+        return (p.getNorm(p.getX(), p.getY(), q.getX(), q.getY()) < (p.getRadius() + q.getRadius())) && (p.getVx()+p.getVy()+q.getVx()+q.getVy() != 0);
     }
 
 
@@ -170,28 +170,31 @@ public class PoolTableRunnable {
         removeBuchacaCollisions();
         for(int i = 6; i < t.particles.size(); i++){
             Particle p = t.particles.get(i);
-            boolean flag = false;
+//            if(p.getIdx() >= 6)
+//                System.out.println("Particle " + p.getIdx() + ": " + p.getX() + ", " + p.getY() + " vel: " + p.getVx() + ", " + p.getVy() + " acc: " + p.getDerivsX()[2] + ", " + p.getDerivsY()[2]);
             Double[] forceP;
                 /*para cada partícula p, itero por el resto de las partículas a ver cuáles la están "influenciando"
                 acumulo las fuerzas para sacar la fuerza neta*/
             for(int j = i + 1; j < t.particles.size(); j++) {
                 Particle q = t.particles.get(j);
-                if (inContact(p,q)) {
+                if (colliding(p,q)) {
                     //si se influencian, calculo la fuerza entre ellas
                     forceP = p.predictForce(q.getX(), q.getY());
                     //cada bocha tiene que guardar y "acumular" la fuerza de esta interacción
                     p.accumForce(forceP);
                     q.accumForce(new Double[]{-forceP[0], -forceP[1]});
-                    flag = true;
+                    //System.out.println("collision" + p.getIdx() + q.getIdx());
                 }
             }
             if(p.getX() + p.getRadius() >= PoolTable.LONG_SIDE || p.getX() - p.getRadius() <= 0){
                 p.accumForce(p.applyBounceWithVerticalWall2());
+                //System.out.println("vertical " + p.getIdx());
             }
             else if(p.getY() + p.getRadius() >= PoolTable.SHORT_SIDE || p.getY() - p.getRadius() <= 0){
                 p.accumForce(p.applyBounceWithHorizontalWall2());
+                //System.out.println("horizontal" + p.getIdx());
             }
-            if(flag || p.hasAccumForce()) { //si al salir del for hubo al menos una colisión, entonces hay fuerza neta
+            if(p.hasAccumForce()) { //si al salir del for hubo al menos una colisión, entonces hay fuerza neta
                 p.applyUpdate(p.getForce());
                 p.resetForce(); //vuelvo la fuerza a 0 para empezar a acumular de 0 en la próxima iteración
             }
@@ -207,7 +210,7 @@ public class PoolTableRunnable {
             Particle p = table.particles.get(i);
             for (int j = 6; j < table.particles.size(); j++) {
                 Particle q = table.particles.get(j);
-                if (inContact(p, q)) {
+                if (colliding(p, q)) {
                     int toRemove = q.getIdx();
                     table.particles.removeIf(m -> m.getIdx() == toRemove);
                     System.out.println("Saque una bocha");

@@ -374,6 +374,7 @@ public class Particle {
 
     public Double[] applyBounceWithVerticalWall2(){
         boolean right = this.getX() + this.getRadius() >= System2.PoolTable.LONG_SIDE;
+        double springConstant = 10000;
         double dist;
         if(right){
             dist = Math.abs(this.getX() + this.getRadius() - PoolTable.LONG_SIDE);
@@ -387,6 +388,7 @@ public class Particle {
 
     public Double[] applyBounceWithHorizontalWall2(){
         boolean upper = this.getY() + this.getRadius() >= System2.PoolTable.SHORT_SIDE;
+        double springConstant = 10000;
         double dist;
         if(upper){
             dist = Math.abs(this.getY() + this.getRadius() - PoolTable.SHORT_SIDE);
