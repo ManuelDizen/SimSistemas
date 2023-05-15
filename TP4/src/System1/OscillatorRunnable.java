@@ -1,14 +1,12 @@
 package System1;
 
 import IntegrationMethods.Beeman;
-import IntegrationMethods.GPC2;
 import IntegrationMethods.GearPredictorCorrector;
 import IntegrationMethods.VerletOriginal;
 import utils.FileUtils;
 import utils.Particle;
 
 import java.io.File;
-import static IntegrationMethods.Euler.calculateEulerR;
 
 public class OscillatorRunnable {
 
@@ -83,7 +81,7 @@ public class OscillatorRunnable {
             ctr++;
         }*/
         p.setAx( ( (-k * p.getX()) - (osc.getGamma() * p.getVx() ) ) / p.getMass());
-        GPC2 gear = new GPC2(p, delta_t);
+        GearPredictorCorrector gear = new GearPredictorCorrector(delta_t);
         double t = 0;
         double MSE = 0;
         int ctr = 0;
