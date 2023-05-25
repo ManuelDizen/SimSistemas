@@ -2,11 +2,15 @@ package models;
 
 public class Utils {
 
-    public double magnitude(double[] vector){
+    public static double magnitude(double[] vector){
         return Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2));
     }
 
-    public double[] norm(double[] v1, double[] v2){
+    public static double magnitude(Particle p1, Particle p2){
+        return magnitude(new double[]{p2.getX()-p1.getX(), p2.getY()-p1.getY()});
+    }
+
+    public static double[] norm(double[] v1, double[] v2){
         double xDiff = v2[0] - v1[0];
         double yDiff = v2[1] - v1[1];
         double mag = magnitude(new double[]{xDiff, yDiff});
