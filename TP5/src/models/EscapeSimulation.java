@@ -51,7 +51,7 @@ public class EscapeSimulation {
 
             Para el target_x, leer del paper página 4 debajo de "B. Specific Flow Rate"
 
-            TODO: 
+            TODO: Chequear colisiones con las paredes
              */
             double aux_x = (Math.random()*20) + 10;
             double aux_y = (Math.random()*20);
@@ -66,7 +66,6 @@ public class EscapeSimulation {
             p.setTarget_x(target_x);
             p.setTarget_y(10);
             particles.add(p);
-            System.out.println(String.format("Inserted %d", n));
         }
     }
 
