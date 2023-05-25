@@ -11,7 +11,10 @@ public class PedestrianRunnable {
         EscapeSimulation esc = new EscapeSimulation(200, 1.2);
         esc.createParticles();
         try(FileWriter output = new FileWriter(String.format("test_ovito.txt"))){
-            FileUtils.takeSystemSnapshot(output, esc.getParticles(), 0);
+            for(int i = 0; i < 100; i++){
+                FileUtils.takeSystemSnapshot(output, esc.getParticles(), i);
+                esc.iterate();
+            }
         }
         catch(IOException e){
             e.printStackTrace();
