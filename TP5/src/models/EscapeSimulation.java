@@ -45,6 +45,8 @@ public class EscapeSimulation {
         time_step = R_MIN / (2*MAX_DESIRED_VEL); /*VelDMAX == Vesc MAX
                 (So, we choose for the model a fixed value of the escape speed v e = v d max .) */
         delta_r = (R_MAX - R_MIN)/(TAU / time_step);
+        System.out.println("Medidas:\ntarget_d_x1= " + target_d_x1 + "\ntarget_d_x2= " + target_d_x2 +
+                "\ntarget_d= " + target_d);
     }
 
     public double[] calculateEscape(Particle p1, Particle p2){
@@ -72,10 +74,14 @@ public class EscapeSimulation {
             if(walls.size() != 0){
                 /* Colisiona con paredes */
                 for(Wall w : walls){
-                    Particle aux_p = createParticleForWall(w, p);
-                    double[] aux_escape = calculateEscape(aux_p, p);
-                    escape[0] += aux_escape[0];
-                    escape[1] += aux_escape[1];
+                    /* Acá esta el caso especial donde wall es DOWN pero tenes en la pared,
+                    por eso no sale ninguna*/
+                    if(!(w.equals(Wall.DOWN) && p.getX() <=target_d_x2 && p.getX() >= target_d_x1)) {
+                        Particle aux_p = createParticleForWall(w, p);
+                        double[] aux_escape = calculateEscape(aux_p, p);
+                        escape[0] += aux_escape[0];
+                        escape[1] += aux_escape[1];
+                    }
                 }
             }
 
@@ -112,6 +118,23 @@ public class EscapeSimulation {
             }
         }
         updateAllParticles();
+        checkForDoor();
+    }
+
+    public void checkForDoor(){
+        List<Particle> toRemove = new ArrayList<>();
+        for(Particle p : particles){
+            if(p.getX() >= target_d_x1 && p.getX() <= target_d_x2){
+                if(p.getTarget_y() != 0 && p.getY() > 0 && p.getY() <= ROOM_OFFSET_Y){
+                    System.out.println("Cambio target!");
+                    p.setTarget_y(0);
+                }
+                if(p.getY() <= 0){
+                    toRemove.add(p);
+                }
+            }
+        }
+        particles.removeAll(toRemove);
     }
 
     public void updateAllParticles(){
@@ -194,7 +217,6 @@ public class EscapeSimulation {
             double target_x = (aux_x < target_d_x1 + 0.2*target_d) ||
                     (aux_x > target_d_x1 + 0.8*target_d) ?
                     getRandomRange(target_d_x1 + 0.2*target_d, target_d_x1 + 0.8*target_d): aux_x;
-            System.out.println("Target: " + target_x + ", " + ROOM_OFFSET_Y);
             p.setTarget_x(target_x);
             p.setTarget_y(ROOM_OFFSET_Y);
             particles.add(p);
@@ -218,7 +240,6 @@ public class EscapeSimulation {
         for(Particle p : particles){
             double distance = Math.sqrt(Math.pow(x - p.getX(), 2) + Math.pow(y - p.getY(), 2));
             if(distance <= 2*R_MIN){
-                System.out.println("Particle p " + p + " collides with " + x + ", " + y);
                 return true;
             }
         }
