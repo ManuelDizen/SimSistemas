@@ -53,7 +53,7 @@ public class FileUtils {
     }
 
     public static void takeSystemSnapshot(FileWriter fw, List<Particle> particles, int i){
-        setHeaders(fw, particles.size(), i); //TODO: Optimize
+        setHeaders(fw, particles.size(), i);
         try {
             for (Particle p : particles) {
                 fw.write(String.format("%d %f %f %f %f %f %f\n", p.getIdx(),

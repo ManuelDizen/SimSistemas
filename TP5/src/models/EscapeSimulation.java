@@ -22,9 +22,7 @@ public class EscapeSimulation {
 
     private static final double TAU = 0.5; /*We choose τ = 0.5 s in accordance to the
                         value used in the desired force in the social force model*/
-
-
-
+    private static double delta_r;
     private final List<Particle> particles = new ArrayList<>();
     private final List<Particle> corners = new ArrayList<>();
     private static int N_PARTICLES;
@@ -46,6 +44,7 @@ public class EscapeSimulation {
         target_d_x2 = ((double) ROOM_WIDTH /2) + (target_d/2);
         time_step = R_MIN / (2*MAX_DESIRED_VEL); /*VelDMAX == Vesc MAX
                 (So, we choose for the model a fixed value of the escape speed v e = v d max .) */
+        delta_r = (R_MAX - R_MIN)/(TAU / time_step);
     }
 
     public double[] calculateEscape(Particle p1, Particle p2){
@@ -97,9 +96,9 @@ public class EscapeSimulation {
             // 3. Calculo direcciones y magnitudes de velocidades
             if(hasCollision(escape)){
                 // Necesito calcular en función de la vei
-                p.setVx(p.getVx() + escape[0]);
-                p.setVy(p.getVy() + escape[1]); //TODO: Check de paranoia, pero ver si el vector escape tiene seteado
-                                    // el versor * la magnitud o solo el versor
+                p.setVx(escape[0]);
+                p.setVy(escape[1]);
+
             }
             else{
                 // NO tiene colisión => Uso vdi
@@ -142,10 +141,6 @@ public class EscapeSimulation {
         el punto mas cercano al centro de la partícula. Por ende, va a ser en línea recta del centro
         hasta la pared. Se crea esta partícula auxiliar para simular la colisión y no reescribir todo,
         pero es lo mismo.
-
-        TODO: Acá hay algo lógico que no llegue a pensar. Cuando una partícula choca con una pared,
-        al instante siguiente se pone la velocidad correcta, que está bien. El problema es que se
-        queda en un loop donde vuelve a tirar hacia la pared un instante después.
          */
         switch(w){
             case UP:
@@ -193,8 +188,6 @@ public class EscapeSimulation {
             El radio inicial de todas será r_min
 
             Para el target_x, leer del paper página 4 debajo de "B. Specific Flow Rate"
-
-            TODO: Chequear colisiones con las paredes
              */
             double aux_x = (Math.random()*ROOM_WIDTH);
             double aux_y = (Math.random()*ROOM_HEIGHT) + ROOM_OFFSET_Y;
