@@ -111,21 +111,16 @@ public class EscapeSimulation {
                 p.setVy(vd_norm[1] * vd_magnitude);
             }
         }
-        Particle p = particles.get(0);
-        System.out.println("Partícula 1: " + p.getX() + ", " + p.getY());
         updateAllParticles();
     }
 
     public void updateAllParticles(){
-        double old_x = particles.get(0).getX();
         for(Particle p : particles){
             double new_x = p.getX() + (p.getVx() * time_step);
             double new_y = p.getY() + (p.getVy() * time_step);
             p.setX(new_x);
             p.setY(new_y);
         }
-        Particle p = particles.get(0);
-        System.out.println("Cambio " + old_x + " por " + p.getX());
     }
 
     public boolean hasCollision(double[] escape){
