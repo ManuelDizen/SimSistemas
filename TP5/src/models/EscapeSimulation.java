@@ -64,7 +64,7 @@ public class EscapeSimulation {
             double[] escape = new double[]{0,0};
             for(Particle q : particles){
                 if(p!=q && collides(p,q)){
-                    double[] aux_escape = calculateEscape(p,q);
+                    double[] aux_escape = calculateEscape(q,p);
                     escape[0] += aux_escape[0];
                     escape[1] += aux_escape[1];
                 }
@@ -74,7 +74,7 @@ public class EscapeSimulation {
                 /* Colisiona con paredes */
                 for(Wall w : walls){
                     Particle aux_p = createParticleForWall(w, p);
-                    double[] aux_escape = calculateEscape(p, aux_p);
+                    double[] aux_escape = calculateEscape(aux_p, p);
                     escape[0] += aux_escape[0];
                     escape[1] += aux_escape[1];
                 }
@@ -145,7 +145,7 @@ public class EscapeSimulation {
 
         TODO: Acá hay algo lógico que no llegue a pensar. Cuando una partícula choca con una pared,
         al instante siguiente se pone la velocidad correcta, que está bien. El problema es que se
-        queda en un loop donde vuelve a tirar hacia la pared un instante después. 
+        queda en un loop donde vuelve a tirar hacia la pared un instante después.
          */
         switch(w){
             case UP:
