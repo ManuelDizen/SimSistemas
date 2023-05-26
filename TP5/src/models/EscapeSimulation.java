@@ -204,6 +204,18 @@ public class EscapeSimulation {
             p.setTarget_y(ROOM_OFFSET_Y);
             particles.add(p);
         }
+        createCornerParticles();
+    }
+
+    public void createCornerParticles(){
+        Particle p = new Particle(0,0,0,0,0);
+        corners.add(p);
+        p = new Particle(0,ROOM_TOTAL_HEIGHT,0,0,0);
+        corners.add(p);
+        p = new Particle(ROOM_WIDTH, ROOM_TOTAL_HEIGHT, 0,0,0);
+        corners.add(p);
+        p = new Particle(ROOM_WIDTH, 0,0,0,0);
+        corners.add(p);
     }
 
     // La verdad es que lo podemos refactorear, me dio paja pensar en la función general
@@ -229,6 +241,10 @@ public class EscapeSimulation {
 
     public List<Particle> getParticles(){
         return this.particles;
+    }
+
+    public List<Particle> getCorners(){
+        return this.corners;
     }
 
 

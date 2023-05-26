@@ -12,7 +12,7 @@ public class PedestrianRunnable {
         esc.createParticles();
         try(FileWriter output = new FileWriter(String.format("test_ovito.txt"))){
             for(int i = 0; i < 1000; i++){
-                FileUtils.takeSystemSnapshot(output, esc.getParticles(), i);
+                FileUtils.takeSystemSnapshotWCorners(output, esc.getParticles(), esc.getCorners(), i);
                 esc.iterate();
             }
         }

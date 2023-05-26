@@ -68,6 +68,29 @@ public class FileUtils {
         }
     }
 
+    public static void takeSystemSnapshotWCorners(FileWriter fw, List<Particle> particles, List<Particle> corners,
+                                                  int i){
+        setHeaders(fw, particles.size() + corners.size(), i);
+        try {
+            for (Particle p : particles) {
+                fw.write(String.format("%d %f %f %f %f %f %f\n", p.getIdx(),
+                        p.getX(), p.getY(), 0 * 1.0,
+                        p.getVx(), p.getVy(),
+                        p.getRadius()));
+            }
+            for(Particle p : corners){
+                fw.write(String.format("%d %f %f %f %f %f %f\n", p.getIdx(),
+                        p.getX(), p.getY(), 0 * 1.0,
+                        p.getVx(), p.getVy(),
+                        p.getRadius()));
+            }
+        }
+        catch(IOException e){
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+    }
+
     private static void setHeaders(FileWriter output, int N, int i){
         try {
             output.write(String.format("%d\nFrame %d\n", N, i));
