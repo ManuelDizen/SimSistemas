@@ -97,8 +97,8 @@ public class EscapeSimulation {
             // 3. Calculo direcciones y magnitudes de velocidades
             if(hasCollision(escape)){
                 // Necesito calcular en función de la vei
-                p.setVx(escape[0]);
-                p.setVy(escape[1]); //TODO: Check de paranoia, pero ver si el vector escape tiene seteado
+                p.setVx(p.getVx() + escape[0]);
+                p.setVy(p.getVy() + escape[1]); //TODO: Check de paranoia, pero ver si el vector escape tiene seteado
                                     // el versor * la magnitud o solo el versor
             }
             else{
@@ -142,6 +142,10 @@ public class EscapeSimulation {
         el punto mas cercano al centro de la partícula. Por ende, va a ser en línea recta del centro
         hasta la pared. Se crea esta partícula auxiliar para simular la colisión y no reescribir todo,
         pero es lo mismo.
+
+        TODO: Acá hay algo lógico que no llegue a pensar. Cuando una partícula choca con una pared,
+        al instante siguiente se pone la velocidad correcta, que está bien. El problema es que se
+        queda en un loop donde vuelve a tirar hacia la pared un instante después. 
          */
         switch(w){
             case UP:
