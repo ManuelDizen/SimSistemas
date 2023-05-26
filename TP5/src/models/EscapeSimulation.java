@@ -126,7 +126,6 @@ public class EscapeSimulation {
         for(Particle p : particles){
             if(p.getX() >= target_d_x1 && p.getX() <= target_d_x2){
                 if(p.getTarget_y() != 0 && p.getY() > 0 && p.getY() <= ROOM_OFFSET_Y){
-                    System.out.println("Cambio target!");
                     p.setTarget_y(0);
                 }
                 if(p.getY() <= 0){
@@ -184,7 +183,8 @@ public class EscapeSimulation {
         if(p.getY() + p.getRadius() > (ROOM_HEIGHT + ROOM_OFFSET_Y)){
             walls.add(UP);
         }
-        if(p.getY() - p.getRadius() < (0 + ROOM_OFFSET_Y)){ //Dejo el 0 por claridad de lo q hace (removible)
+        if(p.getY() - p.getRadius() < (0 + ROOM_OFFSET_Y)
+        || p.getY() - p.getRadius() < 0){ //Dejo el 0 por claridad de lo q hace (removible)
             walls.add(DOWN);
         }
         return walls;
