@@ -49,9 +49,13 @@ public class EscapeSimulation {
     }
 
     public double[] calculateEscape(Particle p1, Particle p2){
-        double magnitude = Utils.magnitude(p1, p2);
+        double[] norm = Utils.norm(new double[]{p1.getX(), p1.getY()},
+                new double[]{p2.getX(), p2.getY()});
+        return new double[]{norm[0]*MAX_ESCAPE_VEL, norm[1]*MAX_ESCAPE_VEL};
+
+        /*double magnitude = Utils.magnitude(p1, p2);
         return new double[]{((p2.getX() - p1.getX())/magnitude)*MAX_ESCAPE_VEL,
-                ((p2.getY() - p1.getY())/magnitude)*MAX_ESCAPE_VEL};
+                ((p2.getY() - p1.getY())/magnitude)*MAX_ESCAPE_VEL};*/
     }
 
     public void iterate(){
@@ -102,8 +106,8 @@ public class EscapeSimulation {
                 double vd_magnitude = MAX_DESIRED_VEL * Math.pow(
                         (p.getRadius() - R_MIN)/(R_MAX - R_MIN), BETA
                 );
-                double[] vd_norm = Utils.norm(new double[]{p.getTarget_x(), p.getTarget_y()},
-                        new double[]{p.getX(), p.getY()});
+                double[] vd_norm = Utils.norm(new double[]{p.getX(), p.getY()},
+                        new double[]{p.getTarget_x(), p.getTarget_y()});
                 p.setVx(vd_norm[0] * vd_magnitude);
                 p.setVy(vd_norm[1] * vd_magnitude);
             }
@@ -198,6 +202,7 @@ public class EscapeSimulation {
             double target_x = (aux_x < target_d_x1 + 0.2*target_d) ||
                     (aux_x > target_d_x1 + 0.8*target_d) ?
                     getRandomRange(target_d_x1 + 0.2*target_d, target_d_x1 + 0.8*target_d): aux_x;
+            System.out.println("Target: " + target_x + ", " + ROOM_OFFSET_Y);
             p.setTarget_x(target_x);
             p.setTarget_y(ROOM_OFFSET_Y);
             particles.add(p);

@@ -67,6 +67,7 @@ public class FileUtils {
             System.exit(1);
         }
     }
+
     private static void setHeaders(FileWriter output, int N, int i){
         try {
             output.write(String.format("%d\nFrame %d\n", N, i));
