@@ -76,7 +76,8 @@ public class EscapeSimulation {
                 for(Wall w : walls){
                     /* Acá esta el caso especial donde wall es DOWN pero tenes en la pared,
                     por eso no sale ninguna*/
-                    if(!(w.equals(Wall.DOWN) && p.getX() <=target_d_x2 && p.getX() >= target_d_x1)) {
+                    if(!((w.equals(Wall.DOWN) || w.equals(Wall.DOWN_END))
+                            && p.getX() <=target_d_x2 && p.getX() >= target_d_x1)) {
                         Particle aux_p = createParticleForWall(w, p);
                         double[] aux_escape = calculateEscape(aux_p, p);
                         escape[0] += aux_escape[0];
@@ -168,6 +169,8 @@ public class EscapeSimulation {
                 return new Particle(0, ref.getY(), 0,0 ,0);
             case RIGHT:
                 return new Particle(ROOM_WIDTH, ref.getY(), 0,0 ,0);
+            case DOWN_END:
+                return new Particle(ref.getX(), 0, 0, 0,0);
         }
         return null;
     }
@@ -183,9 +186,11 @@ public class EscapeSimulation {
         if(p.getY() + p.getRadius() > (ROOM_HEIGHT + ROOM_OFFSET_Y)){
             walls.add(UP);
         }
-        if(p.getY() - p.getRadius() < (0 + ROOM_OFFSET_Y)
-        || p.getY() - p.getRadius() < 0){ //Dejo el 0 por claridad de lo q hace (removible)
+        if(p.getY() - p.getRadius() < (0 + ROOM_OFFSET_Y) && p.getTarget_y() == ROOM_OFFSET_Y){ //Dejo el 0 por claridad de lo q hace (removible)
             walls.add(DOWN);
+        }
+        if(p.getY() - p.getRadius() < 0){
+            walls.add(DOWN_END);
         }
         return walls;
     }

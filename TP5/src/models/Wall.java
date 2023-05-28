@@ -4,5 +4,6 @@ public enum Wall {
     UP,
     RIGHT,
     DOWN,
-    LEFT
+    LEFT,
+    DOWN_END
 }
