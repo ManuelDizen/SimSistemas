@@ -16,8 +16,8 @@ public class EscapeSimulation {
     private static final double MAX_DESIRED_VEL = 2.0; // 2m/s
     private static final double MAX_ESCAPE_VEL = MAX_DESIRED_VEL; // ve max = vd max (en paper)
 
-    private static final double R_MIN = 0.15; // m
-    private static final double R_MAX = 0.32;
+    private static final double R_MIN = 0.10; // m
+    private static final double R_MAX = 0.37;
     private static final double BETA = 0.9;
 
     private static final double TAU = 0.5; /*We choose τ = 0.5 s in accordance to the
@@ -31,6 +31,7 @@ public class EscapeSimulation {
     private static double target_d_x1;
     private static double target_d_x2;
     private static double time_step;
+    private double time_elapsed;
     private static int ROOM_WIDTH = 20;
     private static int ROOM_HEIGHT = 20;
     private static int ROOM_OFFSET_Y = 10;
@@ -47,6 +48,7 @@ public class EscapeSimulation {
         delta_r = (R_MAX - R_MIN)/(TAU / time_step);
         System.out.println("Medidas:\ntarget_d_x1= " + target_d_x1 + "\ntarget_d_x2= " + target_d_x2 +
                 "\ntarget_d= " + target_d);
+        time_elapsed = 0;
     }
 
     public double[] calculateEscape(Particle p1, Particle p2){
@@ -118,6 +120,7 @@ public class EscapeSimulation {
                 p.setVy(vd_norm[1] * vd_magnitude);
             }
         }
+        time_elapsed += time_step;
         updateAllParticles();
         checkForDoor();
     }
@@ -125,12 +128,12 @@ public class EscapeSimulation {
     public void checkForDoor(){
         List<Particle> toRemove = new ArrayList<>();
         for(Particle p : particles){
-            if(p.getX() >= target_d_x1 && p.getX() <= target_d_x2){
+            if(p.getY() <= 0){
+                toRemove.add(p);
+            }
+            else if(p.getX() >= target_d_x1 && p.getX() <= target_d_x2){
                 if(p.getTarget_y() != 0 && p.getY() > 0 && p.getY() <= ROOM_OFFSET_Y){
                     p.setTarget_y(0);
-                }
-                if(p.getY() <= 0){
-                    toRemove.add(p);
                 }
             }
         }
@@ -151,15 +154,6 @@ public class EscapeSimulation {
     }
 
     public Particle createParticleForWall(Wall w, Particle ref){
-        /*
-        "In the case of interaction with a wall, x j indicates the nearest
-        point on the wall to the center of particle p i ."
-
-        A juzgar por esta parte del paper, la velocidad de escape con una pared se debe simular con
-        el punto mas cercano al centro de la partícula. Por ende, va a ser en línea recta del centro
-        hasta la pared. Se crea esta partícula auxiliar para simular la colisión y no reescribir todo,
-        pero es lo mismo.
-         */
         switch(w){
             case UP:
                 return new Particle(ref.getX(), ROOM_TOTAL_HEIGHT, 0,0 ,0);
@@ -260,13 +254,16 @@ public class EscapeSimulation {
         return (Math.random() * (max-min)) + min;
     }
 
-    public List<Particle> getParticles(){
-        return this.particles;
+    public double getTimeElapsed(){return this.time_elapsed;}
+    public List<Particle> getParticles(){return this.particles;}
+    public List<Particle> getCorners(){return this.corners;}
+    public int getRemainingParticles(){
+        int count = 0;
+        for(Particle p : particles){
+            if(p.getTarget_y() == ROOM_OFFSET_Y){
+                count++;
+            }
+        }
+        return count;
     }
-
-    public List<Particle> getCorners(){
-        return this.corners;
-    }
-
-
 }
