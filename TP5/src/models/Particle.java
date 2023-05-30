@@ -13,6 +13,8 @@ public class Particle {
 
     private double radius;
 
+    private double nextRadius;
+
 
     public Particle(double x, double y, double vx, double vy, double radius) {
         this.x = x;
@@ -89,5 +91,13 @@ public class Particle {
 
     public String toString(){
         return "Particle " + idx + " (" + x + ", " + y + ")";
+    }
+
+    public double getNextRadius() {
+        return nextRadius;
+    }
+
+    public void setNextRadius(double nextRadius) {
+        this.nextRadius = nextRadius;
     }
 }

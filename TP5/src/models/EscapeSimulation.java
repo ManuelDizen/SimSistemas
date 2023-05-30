@@ -88,18 +88,19 @@ public class EscapeSimulation {
                 }
             }
 
+
             // 2. Ajusto radios de acuerdo a si colisiono o no
             if(!hasCollision(escape)){
                 double adding_radius = (R_MAX - R_MIN)/(TAU / time_step);
                 if(p.getRadius() + adding_radius >= R_MAX){
-                    p.setRadius(R_MAX);
+                    p.setNextRadius(R_MAX);
                 }
                 else{
-                    p.setRadius(p.getRadius() + adding_radius);
+                    p.setNextRadius(p.getRadius() + adding_radius);
                 }
             }
             else{
-                p.setRadius(R_MIN); // COlisiono con algo => Vuelve a estado 0
+                p.setNextRadius(R_MIN); // COlisiono con algo => Vuelve a estado 0
             }
 
             // 3. Calculo direcciones y magnitudes de velocidades
@@ -107,18 +108,18 @@ public class EscapeSimulation {
                 // Necesito calcular en función de la vei
                 p.setVx(escape[0]);
                 p.setVy(escape[1]);
-
             }
             else{
                 // NO tiene colisión => Uso vdi
                 double vd_magnitude = MAX_DESIRED_VEL * Math.pow(
-                        (p.getRadius() - R_MIN)/(R_MAX - R_MIN), BETA
+                        (p.getNextRadius() - R_MIN)/(R_MAX - R_MIN), BETA
                 );
                 double[] vd_norm = Utils.norm(new double[]{p.getX(), p.getY()},
                         new double[]{p.getTarget_x(), p.getTarget_y()});
                 p.setVx(vd_norm[0] * vd_magnitude);
                 p.setVy(vd_norm[1] * vd_magnitude);
             }
+            
         }
         time_elapsed += time_step;
         updateAllParticles();
@@ -146,6 +147,7 @@ public class EscapeSimulation {
             double new_y = p.getY() + (p.getVy() * time_step);
             p.setX(new_x);
             p.setY(new_y);
+            p.setRadius(p.getNextRadius());
         }
     }
 
