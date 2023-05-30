@@ -132,10 +132,8 @@ public class EscapeSimulation {
             if(p.getY() <= 0){
                 toRemove.add(p);
             }
-            else if(p.getX() >= target_d_x1 && p.getX() <= target_d_x2){
-                if(p.getTarget_y() != 0 && p.getY() > 0 && p.getY() <= ROOM_OFFSET_Y){
-                    p.setTarget_y(0);
-                }
+            else if(p.getTarget_y() != 0 && p.getY() < ROOM_OFFSET_Y){
+                p.setTarget_y(0);
             }
         }
         particles.removeAll(toRemove);
