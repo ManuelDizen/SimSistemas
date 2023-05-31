@@ -129,7 +129,7 @@ public class EscapeSimulation {
     public void checkForDoor(){
         List<Particle> toRemove = new ArrayList<>();
         for(Particle p : particles){
-            if(p.getY() <= 0){
+            if(p.getY() - p.getRadius() <= 0){
                 toRemove.add(p);
             }
             else if(p.getTarget_y() != 0 && p.getY() < ROOM_OFFSET_Y){

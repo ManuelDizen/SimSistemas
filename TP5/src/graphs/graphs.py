@@ -30,7 +30,7 @@ for i in range(0,10):
     particles = []
     for line in lines:
         data = line.split(" ")
-        if data[0] == '' or float(data[0]) > 65.0:
+        if data[0] == '' or float(data[0]) > 80.0:
             continue
         times.append(float(data[0]))
         particles.append(float(data[1]))
