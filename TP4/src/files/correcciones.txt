@@ -1,0 +1,32 @@
+#4
+· el eje x esta en sentido contrario. deberia aumentar dt hacia la derecha
+· recuerden usar simbolos para mostar los datos
+
+#10
+· no hace falta desarrollar el algoritmo. si mencionar cual se uso
+
+#11
+· el sistema se presenta en la seccion de simulaciones. aca solo mencionar las caracteristicas generales del modelo de interaccion entre particulas y obstaculos (paredes)
+
+#15
+· cuidado con el abuso de notacion. dt=10⁻³, no -3 !
+· Usar notacion exponencial
+
+#16
+· cual es la ubicacion inicial de las bolas
+
+#18
+· unidades
+· parece que crece la funcion porque hay pelotas que se escapan, puede ser?
+
+#20
+· cuantas realizaciones hicieron?
+
+#21
+· bien por mirar el ejercicio optativo
+
+#23
+· hubiera estado muy bueno comparar explicitamente los resultados de eventos vs paso temporal
+
+#24
+· una diapo que indique la finalizacion de la presentacion
