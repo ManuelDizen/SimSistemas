@@ -70,19 +70,6 @@ public class Room {
         corners.add(p);
     }
 
-    public void setTargets(double d, double d1, double d2) {
-        for(Particle p : particles) {
-            double target_x = (p.getX() < d1 + 0.2*d) ||
-                    (p.getX() > d1 + 0.8*d) ?
-                    getRandomRange(d1 + 0.2*d, d1 + 0.8*d): p.getX();
-            p.setTarget_x(target_x);
-        }
-    }
-
-    private double getRandomRange(double min, double max){
-        return (Math.random() * (max-min)) + min;
-    }
-
     public int getNParticles() {
         return n_particles;
     }
