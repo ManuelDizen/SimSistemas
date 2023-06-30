@@ -20,10 +20,6 @@ public class Room {
 
     private final List<Particle> corners = new ArrayList<>();
 
-    private static double target_d;
-    private static double target_d_x1;
-    private static double target_d_x2;
-
     public Room(int n_particles, int width, int height, int offsetY) {
         this.n_particles = n_particles;
         this.width = width;
@@ -57,10 +53,6 @@ public class Room {
                 aux_y = (Math.random()*height) + offsetY;
             }
             Particle p = new Particle(aux_x, aux_y, 0, 0, R_MIN);
-            double target_x = (aux_x < target_d_x1 + 0.2*target_d) ||
-                    (aux_x > target_d_x1 + 0.8*target_d) ?
-                    getRandomRange(target_d_x1 + 0.2*target_d, target_d_x1 + 0.8*target_d): aux_x;
-            p.setTarget_x(target_x);
             p.setTarget_y(offsetY);
             particles.add(p);
         }
@@ -76,6 +68,15 @@ public class Room {
         corners.add(p);
         p = new Particle(width, 0,0,0,0);
         corners.add(p);
+    }
+
+    public void setTargets(double d, double d1, double d2) {
+        for(Particle p : particles) {
+            double target_x = (p.getX() < d1 + 0.2*d) ||
+                    (p.getX() > d1 + 0.8*d) ?
+                    getRandomRange(d1 + 0.2*d, d1 + 0.8*d): p.getX();
+            p.setTarget_x(target_x);
+        }
     }
 
     private double getRandomRange(double min, double max){

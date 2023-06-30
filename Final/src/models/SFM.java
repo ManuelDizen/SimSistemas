@@ -4,17 +4,17 @@ import java.util.List;
 
 public class SFM implements PedestrianModel {
 
-    private static int N_PARTICLES;
-
-
-
     private Room room;
 
-    public SFM(int N, double d, Room room) {
-        N_PARTICLES = N;
+    public SFM(double d, Room room) {
         this.room = room;
     }
 
+
+    @Override
+    public void calculateTarget(double d) {
+
+    }
 
     @Override
     public void iterate() {

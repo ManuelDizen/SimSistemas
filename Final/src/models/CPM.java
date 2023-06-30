@@ -38,17 +38,22 @@ public class CPM implements PedestrianModel{
 
     public CPM(double d, Room room){
         this.room = room;
+        calculateTarget(d);
         this.particles = room.getParticles();
         this.corners = room.getCorners();
-        target_d = d; // Discutiendo con los chicos, la figura del ejercicio 2 solo se toma si hacemos SFM
-        target_d_x1 = ((double) room.getWidth() /2) - (target_d/2);
-        target_d_x2 = ((double) room.getWidth() /2) + (target_d/2);
         time_step = R_MIN / (2*MAX_DESIRED_VEL); /*VelDMAX == Vesc MAX
                 (So, we choose for the model a fixed value of the escape speed v e = v d max .) */
         delta_r = (R_MAX - R_MIN)/(TAU / time_step);
         System.out.println("Medidas:\ntarget_d_x1= " + target_d_x1 + "\ntarget_d_x2= " + target_d_x2 +
                 "\ntarget_d= " + target_d);
         time_elapsed = 0;
+    }
+
+    public void calculateTarget(double d) {
+        target_d = d; // Discutiendo con los chicos, la figura del ejercicio 2 solo se toma si hacemos SFM
+        target_d_x1 = ((double) room.getWidth() /2) - (target_d/2);
+        target_d_x2 = ((double) room.getWidth() /2) + (target_d/2);
+        room.setTargets(target_d, target_d_x1, target_d_x2);
     }
 
     private double[] calculateEscape(Particle p1, Particle p2){
