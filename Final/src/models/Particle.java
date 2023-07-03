@@ -15,6 +15,24 @@ public class Particle {
 
     private double nextRadius;
 
+    private double mass;
+
+    private Double[] force;
+
+    private Double[] derivsX;
+    private Double[] derivsY;
+
+
+    public Particle(double x, double y, double vx, double vy, double radius, double mass) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = radius;
+        this.mass = mass;
+        this.idx = count++;
+        this.force = new Double[]{0.0, 0.0};
+    }
 
     public Particle(double x, double y, double vx, double vy, double radius) {
         this.x = x;
@@ -23,6 +41,7 @@ public class Particle {
         this.vy = vy;
         this.radius = radius;
         this.idx = count++;
+        this.force = new Double[]{0.0, 0.0};
     }
 
     public double getX() {
@@ -81,6 +100,10 @@ public class Particle {
         this.radius = radius;
     }
 
+    public double getMass() {
+        return mass;
+    }
+
     public int getIdx() {
         return idx;
     }
@@ -100,4 +123,47 @@ public class Particle {
     public void setNextRadius(double nextRadius) {
         this.nextRadius = nextRadius;
     }
+
+    public Double[] getForce() {
+        return force;
+    }
+
+    private void setForce(Double[] force) {
+        this.force = force;
+    }
+
+    public void resetForce() { //resetear fuerza a 0
+        setForce(new Double[]{0.0, 0.0});
+    }
+
+    public void accumForce(Double[] f) {
+        setForce(new Double[]{f[0] + getForce()[0], f[1] + getForce()[1]});
+    }
+
+    /*---------------------------------GEAR PREDICTOR-CORRECTOR--------------------------------*/
+
+    public Double[] getDerivsX() {
+        return derivsX;
+    }
+
+    public void setDerivsX(Double[] derivsX) {
+        this.derivsX = derivsX;
+    }
+
+    public Double[] getDerivsY() {
+        return derivsY;
+    }
+
+    public void setDerivsY(Double[] derivsY) {
+        this.derivsY = derivsY;
+    }
+
+    public void setParameters() {
+        setX(derivsX[0]);
+        setY(derivsY[0]);
+        setVx(derivsX[1]);
+        setVy(derivsY[1]);
+    }
+
+
 }

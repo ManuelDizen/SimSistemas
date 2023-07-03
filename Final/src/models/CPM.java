@@ -41,7 +41,12 @@ public class CPM implements PedestrianModel{
         desiredSpeed = v;
         this.particles = room.getParticles();
         this.corners = room.getCorners();
-        calculateTarget(d);
+        target_d = d; // Discutiendo con los chicos, la figura del ejercicio 2 solo se toma si hacemos SFM
+        target_d_x1 = ((double) room.getWidth() /2) - (target_d/2);
+        target_d_x2 = ((double) room.getWidth() /2) + (target_d/2);
+        for(Particle p : particles) {
+            calculateTarget(d, p);
+        }
         time_step = R_MIN / (2*desiredSpeed); /*VelDMAX == Vesc MAX
                 (So, we choose for the model a fixed value of the escape speed v e = v d max .) */
         delta_r = (R_MAX - R_MIN)/(TAU / time_step);
@@ -51,16 +56,11 @@ public class CPM implements PedestrianModel{
     }
 
     @Override
-    public void calculateTarget(double d) {
-        target_d = d; // Discutiendo con los chicos, la figura del ejercicio 2 solo se toma si hacemos SFM
-        target_d_x1 = ((double) room.getWidth() /2) - (target_d/2);
-        target_d_x2 = ((double) room.getWidth() /2) + (target_d/2);
-        for(Particle p : particles) {
-            double target_x = (p.getX() < target_d_x1 + 0.2*d) ||
-                    (p.getX() > target_d_x1 + 0.8*d) ?
-                    getRandomRange(target_d_x1 + 0.2*d, target_d_x1 + 0.8*d): p.getX();
-            p.setTarget_x(target_x);
-        }
+    public void calculateTarget(double d, Particle p) {
+        double target_x = (p.getX() < target_d_x1 + 0.2*d) ||
+                (p.getX() > target_d_x1 + 0.8*d) ?
+                getRandomRange(target_d_x1 + 0.2*d, target_d_x1 + 0.8*d): p.getX();
+        p.setTarget_x(target_x);
     }
 
     private double getRandomRange(double min, double max){

@@ -18,6 +18,12 @@ public class Utils {
         return vector[0]*vxDiff+vector[1]*vyDiff;
     }
 
+    public static double tangential(double pV[], double qV[], double[] vector) {
+        double vxDiff = qV[0]-pV[0];
+        double vyDiff = qV[1]-pV[1];
+        return vector[0]*vxDiff+vector[1]*vyDiff;
+    }
+
     public static double[] norm(double[] v1, double[] v2){
         double xDiff = v2[0] - v1[0];
         double yDiff = v2[1] - v1[1];

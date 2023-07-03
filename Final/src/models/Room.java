@@ -5,9 +5,11 @@ import java.util.List;
 
 public class Room {
 
-    private static final double R_MIN = 0.10; // m
+    private static final double R_MIN = 0.6; // m
 
-    private static final double R_MAX = 0.37;
+    private static final double R_MAX = 0.7;
+
+    private static final double MASS = 80.0;
 
     public int width;
     public int height;
@@ -52,7 +54,7 @@ public class Room {
                 aux_x = (Math.random()* width);
                 aux_y = (Math.random()*height) + offsetY;
             }
-            Particle p = new Particle(aux_x, aux_y, 0, 0, R_MIN);
+            Particle p = new Particle(aux_x, aux_y, 0, 0, R_MIN, MASS);
             p.setTarget_y(offsetY);
             particles.add(p);
         }
@@ -60,13 +62,13 @@ public class Room {
     }
 
     private void createCornerParticles(){
-        Particle p = new Particle(0,0,0,0,0);
+        Particle p = new Particle(0,0,0,0,0, MASS);
         corners.add(p);
-        p = new Particle(0, totalHeight,0,0,0);
+        p = new Particle(0, totalHeight,0,0,0, MASS);
         corners.add(p);
-        p = new Particle(width, totalHeight, 0,0,0);
+        p = new Particle(width, totalHeight, 0,0,0, MASS);
         corners.add(p);
-        p = new Particle(width, 0,0,0,0);
+        p = new Particle(width, 0,0,0,0, MASS);
         corners.add(p);
     }
 
