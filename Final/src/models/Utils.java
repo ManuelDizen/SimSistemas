@@ -12,11 +12,21 @@ public class Utils {
         return magnitude(new double[]{p2.getX()-p1.getX(), p2.getY()-p1.getY()});
     }
 
+    public static double tangential(Particle p1, Particle p2, double[] vector) {
+        double vxDiff = p2.getVx()-p1.getVx();
+        double vyDiff = p2.getVy()-p1.getVy();
+        return vector[0]*vxDiff+vector[1]*vyDiff;
+    }
+
     public static double[] norm(double[] v1, double[] v2){
         double xDiff = v2[0] - v1[0];
         double yDiff = v2[1] - v1[1];
         double mag = magnitude(new double[]{xDiff, yDiff});
         return new double[]{xDiff/mag, yDiff/mag};
+    }
+
+    public static double[] norm(Particle p, Particle q){
+        return norm(new double[]{p.getX(), p.getY()}, new double[]{q.getX(), q.getY()});
     }
 
     public double[] calculateEscapeVelocity(double[] v1, double[] v2, double escMagnitude){
