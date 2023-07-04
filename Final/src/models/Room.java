@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Room {
 
-    private static final double R_MIN = 0.6; // m
+    private static final double R_MIN = 0.5; // m
 
     private static final double R_MAX = 0.7;
 
@@ -48,12 +48,13 @@ public class Room {
 
             Para el target_x, leer del paper página 4 debajo de "B. Specific Flow Rate"
              */
-            double aux_x = (Math.random()*width);
-            double aux_y = (Math.random()* height) + offsetY;
-            while(Utils.collides(particles, aux_x, aux_y, R_MIN)){
-                aux_x = (Math.random()* width);
-                aux_y = (Math.random()*height) + offsetY;
+            double border = 2*R_MIN;
+            double aux_x, aux_y;
+            do {
+                aux_x = (Math.random()*(width-border)) + R_MIN;
+                aux_y = (Math.random()*(height-border)) + offsetY + R_MIN;
             }
+            while(Utils.collides(particles, aux_x, aux_y, R_MIN));
             Particle p = new Particle(aux_x, aux_y, 0, 0, R_MIN, MASS);
             p.setTarget_y(offsetY);
             particles.add(p);

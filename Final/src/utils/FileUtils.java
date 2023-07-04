@@ -6,6 +6,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
 
@@ -71,18 +73,27 @@ public class FileUtils {
     public static void takeSystemSnapshotWCorners(FileWriter fw, List<Particle> particles, List<Particle> corners,
                                                   int i){
         setHeaders(fw, particles.size() + corners.size(), i);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+
+        // Crear un DecimalFormat utilizando el DecimalFormatSymbols modificado
+        DecimalFormat decimalFormat = new DecimalFormat("#0.000000", symbols);
+
+        // Establecer la configuración regional para utilizar el nuevo DecimalFormatSymbols
+        decimalFormat.setDecimalFormatSymbols(symbols);
+
         try {
             for (Particle p : particles) {
-                fw.write(String.format("%d %f %f %f %f %f %f\n", p.getIdx(),
-                        p.getX(), p.getY(), 0 * 1.0,
-                        p.getVx(), p.getVy(),
-                        p.getRadius()));
+                fw.write(String.format("%d %s %s %s %s %s %s\n", p.getIdx(),
+                        decimalFormat.format(p.getX()), decimalFormat.format(p.getY()), decimalFormat.format(0 * 1.0),
+                        decimalFormat.format(p.getVx()), decimalFormat.format(p.getVy()),
+                        decimalFormat.format(p.getRadius())));
             }
             for(Particle p : corners){
-                fw.write(String.format("%d %f %f %f %f %f %f\n", p.getIdx(),
-                        p.getX(), p.getY(), 0 * 1.0,
-                        p.getVx(), p.getVy(),
-                        p.getRadius()));
+                fw.write(String.format("%d %s %s %s %s %s %s\n", p.getIdx(),
+                        decimalFormat.format(p.getX()), decimalFormat.format(p.getY()), decimalFormat.format(0 * 1.0),
+                        decimalFormat.format(p.getVx()), decimalFormat.format(p.getVy()),
+                        decimalFormat.format(p.getRadius())));
             }
         }
         catch(IOException e){

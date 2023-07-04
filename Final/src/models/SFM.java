@@ -14,14 +14,14 @@ public class SFM implements PedestrianModel {
 
     private double timeElapsed;
 
-    private final static double timeStep = 0.001;
+    private final static double timeStep = 0.0001;
     private static double desiredSpeed;
 
     private static double target_d;
     private static double target_d_x1;
     private static double target_d_x2;
 
-    private static final int GEAR_DELTA_T = -3;
+    private static final int GEAR_DELTA_T = -4;
 
     private static final double TAU = 0.5;
 
@@ -39,13 +39,19 @@ public class SFM implements PedestrianModel {
     private final List<Particle> particles;
     private final List<Particle> corners;
 
+    /*
+    SFM: Social Force Model, modela la interacción de los peatones a medida que se caminan hacia un objetivo usando tres fuerzas:
+    Desire Force, Social Force y Granular Force.
+    Integramos usando Gear Predictor-Corrector de orden 4.
+     */
+
     public SFM(double d, double v, Room room) {
         this.room = room;
         desiredSpeed = v;
         this.particles = room.getParticles();
-        this.corners = room.getCorners();
+        this.corners = room.getCorners();;
         this.gear = new GearPredictorCorrector(Math.pow(10, GEAR_DELTA_T));
-        target_d = d; // Discutiendo con los chicos, la figura del ejercicio 2 solo se toma si hacemos SFM
+        target_d = d;
         target_d_x1 = ((double) room.getWidth() /2) - (target_d/2);
         target_d_x2 = ((double) room.getWidth() /2) + (target_d/2);
         setInitials();
@@ -53,25 +59,29 @@ public class SFM implements PedestrianModel {
     }
 
     private void setInitials() {
-        for(Particle p : particles) {
-            calculateTarget(target_d, p);
-            setInitialVelocity(p);
-            setInitialDerivs(p);
+        Particle p;
+        p = new Particle(target_d_x1, room.getOffsetY(), 0,0, 0);
+        corners.add(p);
+        p = new Particle(target_d_x2, room.getOffsetY(), 0,0,0);
+        corners.add(p);
+        for(Particle q : particles) {
+            calculateTarget(target_d, q); //la forma en la que se eligen los targets es específico del SFM, así que se hace desde acá
+            setInitialVelocity(q); //la implementación de Room no contempla velocidades, se ponen desde acá
+            setInitialDerivs(q); //para el gear
         }
     }
     @Override
     public void calculateTarget(double d, Particle p) {
-        if(p.getX() < (target_d_x1+0.1))
-            p.setTarget_x(target_d_x1+0.1);
-        else if(p.getX() > (target_d_x2-0.1))
-            p.setTarget_x(target_d_x2-0.1);
+        if(p.getX() < (target_d_x1+0.5))
+            p.setTarget_x(target_d_x1+0.5);
+        else if(p.getX() > (target_d_x2-0.5))
+            p.setTarget_x(target_d_x2-0.5);
         else
             p.setTarget_x(p.getX());
     }
 
     private void setInitialVelocity(Particle p) {
         double[] norm = Utils.norm(new double[]{p.getX(), p.getY()}, new double[]{p.getTarget_x(), p.getTarget_y()});
-        //System.out.println("norm: " + norm[0] + " " + norm[1]);
         p.setVx(norm[0]*Math.sqrt(desiredSpeed));
         p.setVy(norm[1]*Math.sqrt(desiredSpeed));
     }
@@ -84,27 +94,31 @@ public class SFM implements PedestrianModel {
     public void iterate() {
         for(int i=0; i<particles.size(); i++) {
             Particle p = particles.get(i);
-            //System.out.println("particle " + p.getIdx() + ": (" + p.getX() + ", " + p.getY() + ") ->" + p.getVx() + " - " + p.getVy() );
+            //Predicción de fuerza
             Double[][] preds = gear.getPredictions(p.getDerivsX(), p.getDerivsY());
-            p.accumForce(desireForce(p, preds[0][0], preds[1][0], preds[0][1], preds[1][1]));
-            predictWithWalls(p, preds);
+            p.accumForce(desireForce(p, preds[0][0], preds[1][0], preds[0][1], preds[1][1])); //Acumulo la Desire Force
+            predictWithWalls(p, preds); //Acumulo la Social Force (y Granular Force si chocara con la pared) de las paredes
             Double[] forceP;
+            //System.out.println("particle " + p.getIdx() + ": (" + p.getX() + ", " + p.getY() + ") ->" + p.getVx() + " - " + p.getVy() );
             for(int j = p.getIdx(); j < particles.size(); j++) {
+                //Comparo a la partícula p con todas las que tengan un idx mayor
                 Particle q = particles.get(j);
                 if(q.getIdx() != p.getIdx()) {
-                    forceP = socialForce(preds[0][0], preds[1][0], p.getRadius(), q.getX(), q.getY(), q.getRadius());
+                    forceP = socialForce(preds[0][0], preds[1][0], p.getRadius(), q.getX(), q.getY(), q.getRadius()); //Acumulo Social Force con
+                                                                                                                    //todas las demás partículas
                     if(Utils.collides(p, q)) {
+                        //si hay choque, acumulo Granular Force
                         Double[] forceG = granularForce(preds[0][0], preds[1][0], new double[]{preds[0][1], preds[1][1]}, p.getRadius(), q.getX(), q.getY(), new double[]{q.getVx(), q.getVy()}, q.getRadius());
                         forceP[0] += forceG[0];
                         forceP[1] += forceG[1];
                     }
                     p.accumForce(forceP);
-                    q.accumForce(new Double[]{-forceP[0], -forceP[1]});
+                    q.accumForce(new Double[]{-forceP[0], -forceP[1]}); //como no se vuelve a comparar el par de partículas, tengo que almacenar
+                                                                        //la fuerza contraria en q
                 }
             }
-            correctForce(p, preds);
-            //System.out.println("force: " + p.getForce()[0] + " " + p.getForce()[1]);
-            p.resetForce();
+            correctForce(p, preds); //Corregimos
+            p.resetForce(); //Dejo en 0 para la siguiente iteración
         }
         checkForDoor();
         timeElapsed += timeStep;
@@ -115,7 +129,7 @@ public class SFM implements PedestrianModel {
         Double[] deltaR2 = {gear.calculateDeltaR2(calcAcc[0], preds[0][2]), gear.calculateDeltaR2(calcAcc[1], preds[1][2])};
         p.setDerivsX(gear.correctPredictions(preds[0], deltaR2[0])); //corrijo y seteo las derivs para la próxima iteración
         p.setDerivsY(gear.correctPredictions(preds[1], deltaR2[1]));
-        p.setParameters();
+        p.setParameters(); //dejo la nueva posición y velocidad
     }
 
     private boolean inDoor(double x) {
@@ -150,7 +164,6 @@ public class SFM implements PedestrianModel {
     //acá los métodos originales para el cálculo de fuerzas
     private Double[] desireForce(Particle p) {
         double[] norm = Utils.norm(new double[]{p.getX(), p.getY()}, new double[]{p.getTarget_x(), p.getTarget_y()});
-        //System.out.println("norm: " + norm[0] + " " + norm[1]);
         double fx = p.getMass()*(desiredSpeed*norm[0]-p.getVx())/TAU;
         double fy = p.getMass()*(desiredSpeed*norm[1]-p.getVy())/TAU;
         return new Double[]{fx, fy};
@@ -170,10 +183,7 @@ public class SFM implements PedestrianModel {
         double dij = Utils.magnitude(p, q);
         double[] nij = Utils.norm(q, p);
         double[] tij = new double[]{-nij[1], nij[0]};
-        //System.out.println("nij " +  nij[0] + " " + nij[1]);
-        //System.out.println("tij " +  tij[0] + " " + tij[1]);
         double tangentialVelocity = Utils.tangential(p, q, tij);
-        //System.out.println("tangVel " + tangentialVelocity);
         double factorBody = Kn*(rij-dij);
         double factorSliding = Kt*(rij-dij)*tangentialVelocity;
         double[] bodyForce = new double[]{factorBody*nij[0], factorBody*nij[1]};
@@ -183,33 +193,40 @@ public class SFM implements PedestrianModel {
 
     //acá los mismos métodos, pero para el Gear Predictor-Corrector
     private Double[] desireForce(Particle p, double x, double y, double vx, double vy) {
+        /*
+        Fuerza deseada: simula el deseo del peatón de caminar hacia su objetivo
+         */
+        //calculo vector de movimiento
         double[] norm = Utils.norm(new double[]{x, y}, new double[]{p.getTarget_x(), p.getTarget_y()});
-        //System.out.println("norm: " + norm[0] + " " + norm[1]);
+        //calculo la fuerza
         double fx = p.getMass()*(desiredSpeed*norm[0]-vx)/TAU;
         double fy = p.getMass()*(desiredSpeed*norm[1]-vy)/TAU;
-        //System.out.println("desireForce " + fx + " " + fy);
         return new Double[]{fx, fy};
     }
 
     private Double[] socialForce(double pX, double pY, double pR, double qX, double qY, double qR) {
+        /*
+        Fuerza Social: fuerza que simula como los peatones afectan su trayectoria ante la presencia de otros
+        Las partículas se repelen entre ellas, mostrando una tendencia a caminar por donde no hay gente
+         */
         double rij = pR + qR;
-        double dij = Utils.magnitude(new double[]{pX-qX, pY-qY});
+        double dij = Utils.magnitude(new double[]{pX-qX, pY-qY}); //distancia entre centros
         double exponent = (rij-dij)/Bi;
         double factor = Ai*Math.exp(exponent);
+        //calculo dirección de la fuerza -> partícula q repele a partícula p
         double[] nij = Utils.norm(new double[]{qX, qY}, new double[]{pX, pY});
         return new Double[]{factor*nij[0], factor*nij[1]};
     }
+    
 
     private Double[] granularForce(double pX, double pY, double[] pV, double pR,
                                    double qX, double qY, double[] qV, double qR) { //podría pasarle directamente el vector derivs, pero así es más legible
+
         double rij = pR + qR;
         double dij = Utils.magnitude(new double[]{pX-qX, pY-qY});
         double[] nij = Utils.norm(new double[]{qX, qY}, new double[]{pX, pY});
-        double[] tij = new double[]{-nij[1], nij[0]};
-        //System.out.println("nij " +  nij[0] + " " + nij[1]);
-        //System.out.println("tij " +  tij[0] + " " + tij[1]);
+        double[] tij = new double[]{-nij[1], nij[0]}; //vector tangencial
         double tangentialVelocity = Utils.tangential(pV, qV, tij);
-        //System.out.println("tangVel " + tangentialVelocity);
         double factorBody = Kn*(rij-dij);
         double factorSliding = Kt*(rij-dij)*tangentialVelocity;
         double[] bodyForce = new double[]{factorBody*nij[0], factorBody*nij[1]};
