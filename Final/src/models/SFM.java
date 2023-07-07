@@ -217,7 +217,7 @@ public class SFM implements PedestrianModel {
         double[] nij = Utils.norm(new double[]{qX, qY}, new double[]{pX, pY});
         return new Double[]{factor*nij[0], factor*nij[1]};
     }
-    
+
 
     private Double[] granularForce(double pX, double pY, double[] pV, double pR,
                                    double qX, double qY, double[] qV, double qR) { //podría pasarle directamente el vector derivs, pero así es más legible

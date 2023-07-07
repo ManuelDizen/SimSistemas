@@ -28,7 +28,15 @@ public class Room {
         this.height = height;
         this.offsetY = offsetY;
         this.totalHeight = height + offsetY;
+        //createFixedParticles();
         createParticles();
+    }
+
+    private void createFixedParticles() {
+        Particle p = new Particle(10, totalHeight-0.01, 0, 0, R_MIN, MASS);
+        p.setTarget_y(offsetY);
+        particles.add(p);
+        //createCornerParticles();
     }
 
     public void createParticles(){
