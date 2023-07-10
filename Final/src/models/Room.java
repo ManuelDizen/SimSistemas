@@ -32,13 +32,6 @@ public class Room {
         createParticles();
     }
 
-    private void createFixedParticles() {
-        Particle p = new Particle(10, totalHeight-0.01, 0, 0, R_MIN, MASS);
-        p.setTarget_y(offsetY);
-        particles.add(p);
-        //createCornerParticles();
-    }
-
     public void createParticles(){
         for(int n = 0; n < n_particles; n++){
             /*
@@ -81,16 +74,8 @@ public class Room {
         corners.add(p);
     }
 
-    public int getNParticles() {
-        return n_particles;
-    }
-
     public int getWidth() {
         return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public int getOffsetY() {

@@ -43,8 +43,10 @@ public class FasterIsSlowerRunnable {
                     SFM sfm = new SFM(d, v, room);
                     int i=0;
                     while (sfm.getRemainingParticles() > 0) {
-                        System.out.println("remaining: " + sfm.getRemainingParticles() + " - time: " + sfm.getTimeElapsed());
-                        FileUtils.takeSystemSnapshotWCorners(output, sfm.getParticles(), sfm.getCorners(), i);
+                        if(i % 1000 == 0) {
+                            FileUtils.takeSystemSnapshotWCorners(output, sfm.getParticles(), sfm.getCorners(), i);
+                            System.out.println("remaining: " + sfm.getRemainingParticles() + " - time: " + sfm.getTimeElapsed());
+                        }
                         output2.write(String.format("%f %d\n", sfm.getTimeElapsed(), sfm.getRemainingParticles()));
                         sfm.iterate();
                         i++;
