@@ -63,7 +63,7 @@ def getdata(N):
     times_to_leave = []
 
     for i in range(0, 5):
-        file_name = '../../punto_a_iter_{}_{}.txt'.format(N, i)
+        file_name = '../../../punto_a_iter_{}_{}.txt'.format(N, i)
         file = open(file_name, 'r')
         lines = file.read().split('\n')
         times = []
@@ -104,7 +104,6 @@ def descarga(N):
 def descarga_all():
 
     Ns = [200, 260, 320, 380]
-    Ns2 = [200, 380, 320, 360]
 
     graph, lbl = plt.subplots()
 
