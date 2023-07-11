@@ -8,6 +8,9 @@ Repositorio para trabajos prácticos de la materia "72.25 - Simulación de Siste
 * :boom: TP4: [Dinámica molecular regida por el paso temporal](https://github.com/ManuelDizen/SimSistemas/tree/TP4/TP4)
 * :runner: TP5: [Dinámica Peatonal](https://github.com/ManuelDizen/SimSistemas/tree/main/TP5)
 
+## Trabajo Práctico Final
+* :running: TP Final: [CPM, SFM, y estudio del efecto Faster Is Slower](https://github.com/ManuelDizen/SimSistemas/tree/main/Final)
+
 ## Integrantes:
 Nombre | Legajo
 -------|--------
